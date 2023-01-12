@@ -1,25 +1,6 @@
 import styles from "./CategoryTable.module.css";
+import categories from "../../data/categories";
 function CategoryTable() {
-      const categories = [
-            {
-                  categoryId: "cat_1",
-                  categoryName: "movies",
-                  questionCount: 10,
-                  lastUpdated: "just now",
-            },
-            {
-                  categoryId: "cat_2",
-                  categoryName: "music",
-                  questionCount: 20,
-                  lastUpdated: "10 minutes ago",
-            },
-            {
-                  categoryId: "cat_3",
-                  categoryName: "sports",
-                  questionCount: 30,
-                  lastUpdated: "last week",
-            },
-      ];
       return (
             <div>
                   <h1>edit game categories</h1>

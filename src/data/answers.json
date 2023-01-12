@@ -1,0 +1,24 @@
+[
+      {
+            "answerId": "ans_1",
+            "answerContent": "Raging Bull",
+            "questionId": "quest_1"
+      },
+      {
+            "answerId": "ans_2",
+            "answerContent": "Taxi Driver",
+            "questionId": "quest_1",
+            "correct": true
+      },
+      {
+            "answerId": "ans_3",
+            "answerContent": "Moonlight",
+            "questionId": "quest_2"
+      },
+      {
+            "answerId": "ans_4",
+            "answerContent": "La La Land",
+            "questionId": "quest_2",
+            "correct": true
+      }
+]
