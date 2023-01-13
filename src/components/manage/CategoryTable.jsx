@@ -20,8 +20,12 @@ function CategoryTable() {
                                           <td>{category.categoryName}</td>
                                           <td>{category.questionCount}</td>
                                           <td>{category.lastUpdated}</td>
-                                          <td>select</td>
-                                          <td>delete</td>
+                                          <td>
+                                                <button>select</button>
+                                          </td>
+                                          <td>
+                                                <button>delete</button>
+                                          </td>
                                     </tr>
                               ))}
                         </tbody>

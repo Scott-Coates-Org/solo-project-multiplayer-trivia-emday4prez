@@ -2,7 +2,7 @@ import questions from "../../data/questions";
 function QuestionsTable() {
       return (
             <div>
-                  <h1>Movies</h1>
+                  <h1>movie questions</h1>
                   <table>
                         <thead>
                               <tr>
@@ -16,8 +16,12 @@ function QuestionsTable() {
                               {questions.map((question) => (
                                     <tr key={question.questionId}>
                                           <td>{question.questionContent}</td>
-                                          <td>select</td>
-                                          <td>delete</td>
+                                          <td>
+                                                <button>select</button>{" "}
+                                          </td>
+                                          <td>
+                                                <button>delete</button>
+                                          </td>
                                     </tr>
                               ))}
                         </tbody>
