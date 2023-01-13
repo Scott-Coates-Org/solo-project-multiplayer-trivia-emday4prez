@@ -1,21 +1,20 @@
-import questions from "../../data/questions";
-function QuestionsTable() {
+import answers from "../../data/answers";
+function AnswersTable() {
       return (
             <div>
-                  <h1>Movies</h1>
                   <table>
                         <thead>
                               <tr>
-                                    <th>question</th>
+                                    <th>answer</th>
 
                                     <th></th>
                                     <th></th>
                               </tr>
                         </thead>
                         <tbody>
-                              {questions.map((question) => (
-                                    <tr key={question.questionId}>
-                                          <td>{question.questionContent}</td>
+                              {answers.map((answer) => (
+                                    <tr key={answer.answerId}>
+                                          <td>{answer.answerContent}</td>
                                           <td>select</td>
                                           <td>delete</td>
                                     </tr>
@@ -26,4 +25,4 @@ function QuestionsTable() {
       );
 }
 
-export default QuestionsTable;
+export default AnswersTable;

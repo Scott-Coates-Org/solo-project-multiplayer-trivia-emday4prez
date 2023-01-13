@@ -1,8 +1,9 @@
-import DbTest from './components/db-test';
-import * as React from 'react';
-import { Routes, Route, Outlet, Link } from 'react-router-dom';
-import CategoryTable from './components/manage/CategoryTable';
-
+import DbTest from "./components/db-test";
+import * as React from "react";
+import { Routes, Route, Outlet, Link } from "react-router-dom";
+import CategoryTable from "./components/manage/CategoryTable";
+import QuestionsTable from "./components/manage/QuestionsTable";
+import AnswersTable from "./components/manage/AnswersTable";
 export default function App() {
       return (
             <div>
@@ -11,7 +12,7 @@ export default function App() {
                   <p>
                         This example demonstrates some of the core features of
                         React Router including nested <code>&lt;Route&gt;</code>
-                        s, <code>&lt;Outlet&gt;</code>s,{' '}
+                        s, <code>&lt;Outlet&gt;</code>s,{" "}
                         <code>&lt;Link&gt;</code>s, and using a "*" route (aka
                         "splat route") to render a "not found" page when someone
                         visits an unrecognized URL.
@@ -75,6 +76,8 @@ function Manage() {
             <div>
                   <h2>MGMT</h2>
                   <CategoryTable />
+                  <QuestionsTable />
+                  <AnswersTable />
             </div>
       );
 }
