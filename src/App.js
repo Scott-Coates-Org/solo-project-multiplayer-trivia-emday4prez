@@ -72,12 +72,19 @@ function Home() {
 }
 
 function Manage() {
+      const [selectedQuestion, setSelectedQuestion] = React.useState(null);
       return (
             <div>
                   <h2>MGMT</h2>
                   <CategoryTable />
-                  <QuestionsTable />
-                  <AnswersTable />
+                  <QuestionsTable
+                        selectedQuestion={selectedQuestion}
+                        setSelectedQuestion={setSelectedQuestion}
+                  />
+                  <AnswersTable
+                        selectedQuestion={selectedQuestion}
+                        setSelectedQuestion={setSelectedQuestion}
+                  />
             </div>
       );
 }
