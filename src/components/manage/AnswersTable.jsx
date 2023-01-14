@@ -1,5 +1,15 @@
-import answers from "../../data/answers";
+import { useState } from "react";
+import answersData from "../../data/answers";
+import Modal from "../modal/Modal";
+const BUTTON_WRAPPER_STYLES = {
+   position: "relative",
+   zIndex: 1,
+};
+
 function AnswersTable({ selectedQuestion, setSelectedQuestion }) {
+   const [isOpen, setIsOpen] = useState(false);
+   const [answers, setAnswers] = useState(answersData);
+
    return (
       <div>
          <h1> movie answers</h1>
@@ -29,7 +39,21 @@ function AnswersTable({ selectedQuestion, setSelectedQuestion }) {
                            <button>correct</button>
                         </td>
                         <td>
-                           <button>delete</button>
+                           <div style={BUTTON_WRAPPER_STYLES}>
+                              <button onClick={() => setIsOpen(true)}>
+                                 delete
+                              </button>
+                              <Modal
+                                 open={isOpen}
+                                 onClose={() => setIsOpen(false)}
+                              >
+                                 <p>
+                                    Are you sure you want to delete this answer?
+                                 </p>
+
+                                 <p>{answer.answerContent}</p>
+                              </Modal>
+                           </div>
                         </td>
                      </tr>
                   ))}
