@@ -1,10 +1,5 @@
 import { useState } from "react";
 import answersData from "../../data/answers";
-import Modal from "../modal/Modal";
-const BUTTON_WRAPPER_STYLES = {
-   position: "relative",
-   zIndex: 1,
-};
 
 function AnswersTable({ selectedQuestion, setSelectedQuestion }) {
    const [isOpen, setIsOpen] = useState(false);
@@ -39,20 +34,8 @@ function AnswersTable({ selectedQuestion, setSelectedQuestion }) {
                            <button>correct</button>
                         </td>
                         <td>
-                           <div style={BUTTON_WRAPPER_STYLES}>
-                              <button onClick={() => setIsOpen(true)}>
-                                 delete
-                              </button>
-                              <Modal
-                                 open={isOpen}
-                                 onClose={() => setIsOpen(false)}
-                              >
-                                 <p>
-                                    Are you sure you want to delete this answer?
-                                 </p>
-
-                                 <p>{answer.answerContent}</p>
-                              </Modal>
+                           <div>
+                              <button>delete</button>
                            </div>
                         </td>
                      </tr>
