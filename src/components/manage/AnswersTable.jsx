@@ -1,6 +1,5 @@
 import Modal from "react-modal";
 import { useState } from "react";
-import answersData from "../../data/answers";
 
 const customStyles = {
    content: {
@@ -12,9 +11,13 @@ const customStyles = {
       transform: "translate(-50%, -50%)",
    },
 };
-function AnswersTable({ selectedQuestion, setSelectedQuestion }) {
+function AnswersTable({
+   selectedQuestion,
+   setSelectedQuestion,
+   answers,
+   setAnswers,
+}) {
    const [modalIsOpen, setIsOpen] = useState(false);
-   const [answers, setAnswers] = useState(answersData);
    const [selectedAnswer, setSelectedAnswer] = useState(null);
 
    function openModal(answer) {
@@ -26,14 +29,15 @@ function AnswersTable({ selectedQuestion, setSelectedQuestion }) {
       setIsOpen(false);
    }
 
-   function onDelete() {
+   function onDelete(e) {
+      e.preventDefault();
       const newAnswers = answers.filter(
          (answer) => answer.answerId !== selectedAnswer
       );
       setAnswers(newAnswers);
       closeModal();
    }
-
+   Modal.setAppElement(document.getElementById("root"));
    return (
       <div>
          <h1> movie answers</h1>
