@@ -80,7 +80,12 @@ function Manage() {
    return (
       <div>
          <h2>MGMT</h2>
-         <CategoryTable />
+         <CategoryTable
+            questions={questions}
+            setQuestions={setQuestions}
+            answers={answers}
+            setAnswers={setAnswers}
+         />
          <QuestionsTable
             questions={questions}
             setQuestions={setQuestions}
