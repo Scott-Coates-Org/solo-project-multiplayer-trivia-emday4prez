@@ -7,6 +7,7 @@ import AnswersTable from "./components/manage/AnswersTable";
 import questionsData from "./data/questions";
 import answersData from "./data/answers";
 import categoriesData from "./data/categories";
+import { useFetchWithAbort } from "./hooks/useFetch";
 export default function App() {
    return (
       <div>
@@ -77,6 +78,10 @@ function Manage() {
    const [selectedQuestion, setSelectedQuestion] = React.useState(null);
    const [questions, setQuestions] = React.useState(questionsData);
    const [answers, setAnswers] = React.useState(answersData);
+   const a = useFetchWithAbort(
+      "https://firestore.googleapis.com/v1/projects/multi-trivia-21ae9/databases/(default)/documents/answers/"
+   );
+   console.log(a);
    return (
       <div>
          <h2>MGMT</h2>
