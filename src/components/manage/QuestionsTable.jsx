@@ -1,6 +1,7 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import Modal from "react-modal";
-
+import { collection, getDocs } from "firebase/firestore";
+import { db } from "../../firebase/client";
 const customStyles = {
    content: {
       top: "50%",
@@ -12,20 +13,27 @@ const customStyles = {
    },
 };
 
-function QuestionsTable({
-   selectedQuestion,
-   setSelectedQuestion,
-   questions,
-   setQuestions,
-   answers,
-   setAnswers,
-}) {
+function QuestionsTable() {
    const [modalIsOpen, setIsOpen] = useState(false);
+   const [questions, setQuestions] = useState([]);
+
+   const fetchPost = async () => {
+      await getDocs(collection(db, "questions")).then((querySnapshot) => {
+         const newData = querySnapshot.docs.map((doc) => ({
+            ...doc.data(),
+            id: doc.id,
+         }));
+         setQuestions(newData);
+         console.log("questions", newData);
+      });
+   };
+
+   useEffect(() => {
+      fetchPost();
+   }, []);
 
    function openModal(question) {
       setIsOpen(true);
-      setSelectedQuestion(question.questionId);
-      console.log(answers);
    }
 
    function closeModal() {
@@ -34,21 +42,21 @@ function QuestionsTable({
 
    function onDelete(e) {
       e.preventDefault();
-      const newQuestions = questions.filter(
-         (q) => q.questionId !== selectedQuestion
-      );
-      setQuestions(newQuestions);
-      const newAnswers = answers.filter(
-         (a) => a.questionId !== selectedQuestion
-      );
-      setAnswers(newAnswers);
+      // const newQuestions = questions.filter(
+      //    (q) => q.questionId !== selectedQuestion
+      // );
+      // setQuestions(newQuestions);
+      // const newAnswers = answers.filter(
+      //    (a) => a.questionId !== selectedQuestion
+      // );
+      // setAnswers(newAnswers);
       closeModal();
    }
    Modal.setAppElement(document.getElementById("root"));
 
    const handleClick = (question) => {
       console.log("questionId: ", question.questionId);
-      setSelectedQuestion(question.questionId);
+      // setSelectedQuestion(question.questionId);
    };
 
    return (
@@ -64,21 +72,22 @@ function QuestionsTable({
                </tr>
             </thead>
             <tbody>
-               {questions.map((question) => (
-                  <tr key={question.questionId}>
-                     <td>{question.questionContent}</td>
-                     <td>
-                        <button onClick={() => handleClick(question)}>
-                           select
-                        </button>{" "}
-                     </td>
-                     <td>
-                        <button onClick={() => openModal(question)}>
-                           delete
-                        </button>
-                     </td>
-                  </tr>
-               ))}
+               {questions &&
+                  questions.map((question) => (
+                     <tr key={question.questionId}>
+                        <td>{question.questionContent}</td>
+                        <td>
+                           <button onClick={() => handleClick(question)}>
+                              select
+                           </button>{" "}
+                        </td>
+                        <td>
+                           <button onClick={() => openModal(question)}>
+                              delete
+                           </button>
+                        </td>
+                     </tr>
+                  ))}
             </tbody>
          </table>
          <Modal

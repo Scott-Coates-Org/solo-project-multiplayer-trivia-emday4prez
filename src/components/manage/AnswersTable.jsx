@@ -1,6 +1,7 @@
 import Modal from "react-modal";
-import { useState } from "react";
-
+import { useState, useEffect } from "react";
+import { collection, getDocs } from "firebase/firestore";
+import { db } from "../../firebase/client";
 const customStyles = {
    content: {
       top: "50%",
@@ -11,18 +12,27 @@ const customStyles = {
       transform: "translate(-50%, -50%)",
    },
 };
-function AnswersTable({
-   selectedQuestion,
-   setSelectedQuestion,
-   answers,
-   setAnswers,
-}) {
+function AnswersTable({ selectedQuestion, setSelectedQuestion }) {
    const [modalIsOpen, setIsOpen] = useState(false);
-   const [selectedAnswer, setSelectedAnswer] = useState(null);
+   const [answers, setAnswers] = useState([]);
+
+   const fetchPost = async () => {
+      await getDocs(collection(db, "answers")).then((querySnapshot) => {
+         const newData = querySnapshot.docs.map((doc) => ({
+            ...doc.data(),
+            id: doc.id,
+         }));
+         setAnswers(newData);
+      });
+   };
+
+   useEffect(() => {
+      fetchPost();
+   }, []);
 
    function openModal(answer) {
       setIsOpen(true);
-      setSelectedAnswer(answer.answerId);
+      //setSelectedAnswer(answer.answerId);
    }
 
    function closeModal() {
@@ -31,10 +41,10 @@ function AnswersTable({
 
    function onDelete(e) {
       e.preventDefault();
-      const newAnswers = answers.filter(
-         (answer) => answer.answerId !== selectedAnswer
-      );
-      setAnswers(newAnswers);
+      // const newAnswers = answers.filter(
+      //    (answer) => answer.answerId !== selectedAnswer
+      // );
+      // setAnswers(newAnswers);
       closeModal();
    }
    Modal.setAppElement(document.getElementById("root"));
@@ -51,30 +61,31 @@ function AnswersTable({
                </tr>
             </thead>
             <tbody>
-               {answers
-                  .filter((answer) => answer.questionId === selectedQuestion)
-                  .map((answer) => (
-                     <tr key={answer.answerId}>
-                        <td>{answer.answerContent}</td>
-                        <td>
-                           {answer.correct ? (
-                              <input type="radio" checked readOnly />
-                           ) : (
-                              <input type="radio" readOnly />
-                           )}
-                        </td>
-                        <td>
-                           <button>correct</button>
-                        </td>
-                        <td>
-                           <div>
-                              <button onClick={() => openModal(answer)}>
-                                 delete
-                              </button>
-                           </div>
-                        </td>
-                     </tr>
-                  ))}
+               {answers &&
+                  answers
+                     //.filter((answer) => answer.questionId === selectedQuestion)
+                     .map((answer) => (
+                        <tr key={answer.answerId}>
+                           <td>{answer.answerContent}</td>
+                           <td>
+                              {answer.correct ? (
+                                 <input type="radio" checked readOnly />
+                              ) : (
+                                 <input type="radio" readOnly />
+                              )}
+                           </td>
+                           <td>
+                              <button>correct</button>
+                           </td>
+                           <td>
+                              <div>
+                                 <button onClick={() => openModal(answer)}>
+                                    delete
+                                 </button>
+                              </div>
+                           </td>
+                        </tr>
+                     ))}
             </tbody>
          </table>
          <Modal

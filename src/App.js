@@ -81,20 +81,8 @@ function Manage() {
 
          <CategoryTable />
 
-         {/* <QuestionsTable
-            questions={questions}
-            setQuestions={setQuestions}
-            answers={answers}
-            setAnswers={setAnswers}
-            selectedQuestion={selectedQuestion}
-            setSelectedQuestion={setSelectedQuestion}
-         />
-         <AnswersTable
-            answers={answers}
-            setAnswers={setAnswers}
-            selectedQuestion={selectedQuestion}
-            setSelectedQuestion={setSelectedQuestion}
-         /> */}
+         <QuestionsTable />
+         <AnswersTable />
       </div>
    );
 }
