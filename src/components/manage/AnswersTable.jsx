@@ -1,5 +1,8 @@
 import Modal from "react-modal";
-import { useState } from "react";
+import { useState, useEffect } from "react";
+import { collection, getDocs, doc, deleteDoc } from "firebase/firestore";
+import { useCollection } from "../../hooks/useCollection";
+import { db } from "../../firebase/client";
 
 const customStyles = {
    content: {
@@ -11,30 +14,41 @@ const customStyles = {
       transform: "translate(-50%, -50%)",
    },
 };
-function AnswersTable({
-   selectedQuestion,
-   setSelectedQuestion,
-   answers,
-   setAnswers,
-}) {
-   const [modalIsOpen, setIsOpen] = useState(false);
-   const [selectedAnswer, setSelectedAnswer] = useState(null);
+function AnswersTable({ selectedQuestion, setSelectedQuestion }) {
+   const { documents: answers } = useCollection("answers");
 
-   function openModal(answer) {
+   const [modalIsOpen, setIsOpen] = useState(false);
+   const [answersData, setAnswersData] = useState([]);
+   const [Id, setId] = useState("");
+
+   const fetchPost = async () => {
+      await getDocs(collection(db, "answers")).then((querySnapshot) => {
+         const newData = querySnapshot.docs.map((doc) => ({
+            ...doc.data(),
+            id: doc.id,
+         }));
+         setAnswersData(newData);
+      });
+   };
+
+   useEffect(() => {
+      fetchPost();
+   }, [answers]);
+
+   function openModal(id) {
       setIsOpen(true);
-      setSelectedAnswer(answer.answerId);
+      setId(id);
    }
 
    function closeModal() {
       setIsOpen(false);
    }
 
-   function onDelete(e) {
+   async function onDelete(e) {
       e.preventDefault();
-      const newAnswers = answers.filter(
-         (answer) => answer.answerId !== selectedAnswer
-      );
-      setAnswers(newAnswers);
+      const reference = doc(db, "answers", Id);
+      await deleteDoc(reference);
+
       closeModal();
    }
    Modal.setAppElement(document.getElementById("root"));
@@ -51,30 +65,31 @@ function AnswersTable({
                </tr>
             </thead>
             <tbody>
-               {answers
-                  .filter((answer) => answer.questionId === selectedQuestion)
-                  .map((answer) => (
-                     <tr key={answer.answerId}>
-                        <td>{answer.answerContent}</td>
-                        <td>
-                           {answer.correct ? (
-                              <input type="radio" checked readOnly />
-                           ) : (
-                              <input type="radio" readOnly />
-                           )}
-                        </td>
-                        <td>
-                           <button>correct</button>
-                        </td>
-                        <td>
-                           <div>
-                              <button onClick={() => openModal(answer)}>
-                                 delete
-                              </button>
-                           </div>
-                        </td>
-                     </tr>
-                  ))}
+               {answersData &&
+                  answersData
+                     //.filter((answer) => answer.questionId === selectedQuestion)
+                     .map((answer) => (
+                        <tr key={answer.answerId}>
+                           <td>{answer.answerContent}</td>
+                           <td>
+                              {answer.correct ? (
+                                 <input type="radio" checked readOnly />
+                              ) : (
+                                 <input type="radio" readOnly />
+                              )}
+                           </td>
+                           <td>
+                              <button>correct</button>
+                           </td>
+                           <td>
+                              <div>
+                                 <button onClick={() => openModal(answer.id)}>
+                                    delete
+                                 </button>
+                              </div>
+                           </td>
+                        </tr>
+                     ))}
             </tbody>
          </table>
          <Modal
@@ -85,10 +100,10 @@ function AnswersTable({
          >
             <h2>delete answer</h2>
             <div>are you sure you want to delete</div>
-            <form>
+            <div>
                <button onClick={closeModal}>cancel</button>
                <button onClick={onDelete}>delete</button>
-            </form>
+            </div>
          </Modal>
       </div>
    );

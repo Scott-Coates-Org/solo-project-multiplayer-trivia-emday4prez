@@ -4,9 +4,7 @@ import { Routes, Route, Outlet, Link } from "react-router-dom";
 import CategoryTable from "./components/manage/CategoryTable";
 import QuestionsTable from "./components/manage/QuestionsTable";
 import AnswersTable from "./components/manage/AnswersTable";
-import questionsData from "./data/questions";
-import answersData from "./data/answers";
-import categoriesData from "./data/categories";
+
 export default function App() {
    return (
       <div>
@@ -74,31 +72,23 @@ function Home() {
 }
 
 function Manage() {
-   const [selectedQuestion, setSelectedQuestion] = React.useState(null);
-   const [questions, setQuestions] = React.useState(questionsData);
-   const [answers, setAnswers] = React.useState(answersData);
+   const [selectedQuestionId, setSelectedQuestionId] = React.useState("");
    return (
       <div>
          <h2>MGMT</h2>
+
          <CategoryTable
-            questions={questions}
-            setQuestions={setQuestions}
-            answers={answers}
-            setAnswers={setAnswers}
+            selectedQuestionId={selectedQuestionId}
+            setSelectedQuestionId={setSelectedQuestionId}
          />
+
          <QuestionsTable
-            questions={questions}
-            setQuestions={setQuestions}
-            answers={answers}
-            setAnswers={setAnswers}
-            selectedQuestion={selectedQuestion}
-            setSelectedQuestion={setSelectedQuestion}
+            selectedQuestionId={selectedQuestionId}
+            setSelectedQuestionId={setSelectedQuestionId}
          />
          <AnswersTable
-            answers={answers}
-            setAnswers={setAnswers}
-            selectedQuestion={selectedQuestion}
-            setSelectedQuestion={setSelectedQuestion}
+            selectedQuestionId={selectedQuestionId}
+            setSelectedQuestionId={setSelectedQuestionId}
          />
       </div>
    );

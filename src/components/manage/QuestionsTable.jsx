@@ -1,6 +1,14 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import Modal from "react-modal";
-
+import {
+   collection,
+   getDocs,
+   doc,
+   deleteDoc,
+   query,
+   where,
+} from "firebase/firestore";
+import { db } from "../../firebase/client";
 const customStyles = {
    content: {
       top: "50%",
@@ -12,42 +20,58 @@ const customStyles = {
    },
 };
 
-function QuestionsTable({
-   selectedQuestion,
-   setSelectedQuestion,
-   questions,
-   setQuestions,
-   answers,
-   setAnswers,
-}) {
+function QuestionsTable({ selectedQuestionId, setSelectedQuestionId }) {
    const [modalIsOpen, setIsOpen] = useState(false);
+   const [questions, setQuestions] = useState([]);
+
+   const questionsRef = collection(db, "questions");
+   const answersRef = collection(db, "answers");
+
+   const fetchPost = async () => {
+      await getDocs(questionsRef).then((querySnapshot) => {
+         const newData = querySnapshot.docs.map((doc) => ({
+            ...doc.data(),
+            id: doc.id,
+         }));
+         setQuestions(newData);
+      });
+   };
+
+   useEffect(() => {
+      fetchPost();
+   }, [questionsRef]);
 
    function openModal(question) {
       setIsOpen(true);
-      setSelectedQuestion(question.questionId);
+      setSelectedQuestionId(question.id);
    }
 
    function closeModal() {
       setIsOpen(false);
    }
 
-   function onDelete(e) {
+   async function onDelete(e) {
       e.preventDefault();
-      const newQuestions = questions.filter(
-         (q) => q.questionId !== selectedQuestion
+
+      const reference = doc(db, "questions", selectedQuestionId);
+      await deleteDoc(reference);
+      const q = query(
+         answersRef,
+         where("questionId", "==", `quest_${selectedQuestionId}`)
       );
-      setQuestions(newQuestions);
-      const newAnswers = answers.filter(
-         (a) => a.questionId !== selectedQuestion
-      );
-      setAnswers(newAnswers);
+      await getDocs(q).then((querySnapshot) => {
+         querySnapshot.docs.forEach((doc) => {
+            deleteDoc(doc.ref);
+         });
+      });
+
       closeModal();
    }
    Modal.setAppElement(document.getElementById("root"));
 
    const handleClick = (question) => {
       console.log("questionId: ", question.questionId);
-      setSelectedQuestion(question.questionId);
+      // setSelectedQuestion(question.questionId);
    };
 
    return (
@@ -63,21 +87,22 @@ function QuestionsTable({
                </tr>
             </thead>
             <tbody>
-               {questions.map((question) => (
-                  <tr key={question.questionId}>
-                     <td>{question.questionContent}</td>
-                     <td>
-                        <button onClick={() => handleClick(question)}>
-                           select
-                        </button>{" "}
-                     </td>
-                     <td>
-                        <button onClick={() => openModal(question)}>
-                           delete
-                        </button>
-                     </td>
-                  </tr>
-               ))}
+               {questions &&
+                  questions.map((question) => (
+                     <tr key={question.questionId}>
+                        <td>{question.questionContent}</td>
+                        <td>
+                           <button onClick={() => handleClick(question)}>
+                              select
+                           </button>{" "}
+                        </td>
+                        <td>
+                           <button onClick={() => openModal(question)}>
+                              delete
+                           </button>
+                        </td>
+                     </tr>
+                  ))}
             </tbody>
          </table>
          <Modal

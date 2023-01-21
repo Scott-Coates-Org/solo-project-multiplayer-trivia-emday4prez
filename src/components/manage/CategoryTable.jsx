@@ -1,7 +1,16 @@
-import categoriesData from "../../data/categories";
-import styles from "./CategoryTable.module.css";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import Modal from "react-modal";
+import {
+   collection,
+   getDocs,
+   doc,
+   deleteDoc,
+   query,
+   where,
+} from "firebase/firestore";
+import { db } from "../../firebase/client";
+import { useCollection } from "../../hooks/useCollection";
+import "./CategoryTable.module.css";
 
 const customStyles = {
    content: {
@@ -14,28 +23,84 @@ const customStyles = {
    },
 };
 
-function CategoryTable({ answers, setAnswers, questions, setQuestions }) {
+function CategoryTable() {
    const [modalIsOpen, setIsOpen] = useState(false);
-   const [selectedCategory, setSelectedCategory] = useState(null);
+   const [categories, setCategories] = useState([]);
+   const [selectedCategoryDocId, setSelectedCategoryDocId] = useState("");
+   const [selectedCategoryId, setSelectedCategoryId] = useState("");
+   const [questionIdsToDelete, setQuestionIdsToDelete] = useState([]);
 
-   const [categories, setCategories] = useState(categoriesData);
+   const questionsRef = collection(db, "questions");
+   const answersRef = collection(db, "answers");
+   const categoriesRef = collection(db, "categories");
 
-   function openModal(cId) {
+   const fetchPost = async () => {
+      await getDocs(categoriesRef).then((querySnapshot) => {
+         const newData = querySnapshot.docs.map((doc) => ({
+            ...doc.data(),
+            id: doc.id,
+         }));
+         setCategories(newData);
+      });
+   };
+   fetchPost();
+   // useEffect(() => {
+   //    fetchPost();
+   // }, [categoriesRef.docs]);
+
+   async function deleteAnswersByQuestionId(arrayOfIds) {
+      console.log("arrayofids", arrayOfIds);
+      for (let id of arrayOfIds) {
+         const answerQuery = query(answersRef, where("questionId", "==", id));
+         const querySnapshot = await getDocs(answerQuery);
+         querySnapshot.docs.forEach(async (doc) => {
+            await deleteDoc(doc.ref);
+         });
+      }
+
+      return;
+   }
+   function openModal(docId, categoryId) {
       setIsOpen(true);
-      setSelectedCategory(cId);
+
+      setSelectedCategoryDocId(docId);
+      setSelectedCategoryId(categoryId);
    }
 
    function closeModal() {
       setIsOpen(false);
    }
 
-   function onDelete(e) {
+   async function onDelete(e) {
       e.preventDefault();
-      console.log("delete", selectedCategory);
-      const newCategories = categories.filter(
-         (c) => c.categoryId !== selectedCategory
+      const questionIds = new Set([]);
+      const reference = doc(db, "categories", selectedCategoryDocId);
+      console.log(selectedCategoryId);
+      const q = query(
+         questionsRef,
+         where("categoryId", "==", selectedCategoryId)
       );
-      setCategories(newCategories);
+      try {
+         const querySnapshot = await getDocs(q);
+         const qIds = querySnapshot.docs.map((doc) => {
+            return doc.data();
+         });
+
+         qIds.forEach((q) => {
+            questionIds.add(q.questionId);
+         });
+         const idsToDelete = Array.from(questionIds);
+         setQuestionIdsToDelete(idsToDelete);
+         deleteAnswersByQuestionId(questionIdsToDelete);
+         querySnapshot.docs.forEach(async (doc) => {
+            await deleteDoc(doc.ref);
+         });
+         await deleteDoc(reference);
+         // deleteDoc(doc.ref);
+      } catch (e) {
+         console.log("error: ", e.message);
+      }
+
       closeModal();
    }
    Modal.setAppElement(document.getElementById("root"));
@@ -43,6 +108,7 @@ function CategoryTable({ answers, setAnswers, questions, setQuestions }) {
    return (
       <div>
          <h1>edit game categories</h1>
+
          <table>
             <thead>
                <tr>
@@ -54,23 +120,29 @@ function CategoryTable({ answers, setAnswers, questions, setQuestions }) {
                </tr>
             </thead>
             <tbody>
-               {categories.map((category) => (
-                  <tr key={category.categoryId}>
-                     <td>{category.categoryName}</td>
-                     <td>{category.questionCount}</td>
-                     <td>{category.lastUpdated}</td>
-                     <td>
-                        <button>select</button>
-                     </td>
-                     <td>
-                        <button onClick={() => openModal(category.categoryId)}>
-                           delete
-                        </button>
-                     </td>
-                  </tr>
-               ))}
+               {categories &&
+                  categories.map((category) => (
+                     <tr key={category.categoryId}>
+                        <td>{category.categoryName}</td>
+                        <td>{category.questionCount}</td>
+                        <td>{category.lastUpdated}</td>
+                        <td>
+                           <button>select</button>
+                        </td>
+                        <td>
+                           <button
+                              onClick={() =>
+                                 openModal(category.id, category.categoryId)
+                              }
+                           >
+                              delete
+                           </button>
+                        </td>
+                     </tr>
+                  ))}
             </tbody>
          </table>
+
          <Modal
             isOpen={modalIsOpen}
             onRequestClose={closeModal}
