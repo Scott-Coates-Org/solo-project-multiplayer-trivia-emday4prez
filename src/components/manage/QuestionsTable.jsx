@@ -54,7 +54,7 @@ function QuestionsTable({ selectedQuestionId, setSelectedQuestionId }) {
       e.preventDefault();
 
       const reference = doc(db, "questions", selectedQuestionId);
-      // await deleteDoc(reference);
+      await deleteDoc(reference);
       const q = query(
          answersRef,
          where("questionId", "==", `quest_${selectedQuestionId}`)
