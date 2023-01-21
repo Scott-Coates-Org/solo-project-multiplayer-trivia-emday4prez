@@ -39,7 +39,7 @@ function QuestionsTable({ selectedQuestionId, setSelectedQuestionId }) {
 
    useEffect(() => {
       fetchPost();
-   }, []);
+   }, [questionsRef]);
 
    function openModal(question) {
       setIsOpen(true);

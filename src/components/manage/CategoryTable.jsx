@@ -1,8 +1,16 @@
 import { useState, useEffect } from "react";
 import Modal from "react-modal";
-import { collection, getDocs } from "firebase/firestore";
-import "./CategoryTable.module.css";
+import {
+   collection,
+   getDocs,
+   doc,
+   deleteDoc,
+   query,
+   where,
+} from "firebase/firestore";
 import { db } from "../../firebase/client";
+import { useCollection } from "../../hooks/useCollection";
+import "./CategoryTable.module.css";
 
 const customStyles = {
    content: {
@@ -18,9 +26,16 @@ const customStyles = {
 function CategoryTable() {
    const [modalIsOpen, setIsOpen] = useState(false);
    const [categories, setCategories] = useState([]);
+   const [selectedCategoryDocId, setSelectedCategoryDocId] = useState("");
+   const [selectedCategoryId, setSelectedCategoryId] = useState("");
+   const [questionIdsToDelete, setQuestionIdsToDelete] = useState([]);
+
+   const questionsRef = collection(db, "questions");
+   const answersRef = collection(db, "answers");
+   const categoriesRef = collection(db, "categories");
 
    const fetchPost = async () => {
-      await getDocs(collection(db, "categories")).then((querySnapshot) => {
+      await getDocs(categoriesRef).then((querySnapshot) => {
          const newData = querySnapshot.docs.map((doc) => ({
             ...doc.data(),
             id: doc.id,
@@ -28,22 +43,63 @@ function CategoryTable() {
          setCategories(newData);
       });
    };
+   fetchPost();
+   // useEffect(() => {
+   //    fetchPost();
+   // }, [categoriesRef.docs]);
 
-   useEffect(() => {
-      fetchPost();
-   }, []);
+   async function deleteAnswersByQuestionId(arrayOfIds) {
+      console.log("arrayofids", arrayOfIds);
+      for (let id of arrayOfIds) {
+         const answerQuery = query(answersRef, where("questionId", "==", id));
+         const querySnapshot = await getDocs(answerQuery);
+         querySnapshot.docs.forEach(async (doc) => {
+            await deleteDoc(doc.ref);
+         });
+      }
 
-   function openModal(cId) {
+      return;
+   }
+   function openModal(docId, categoryId) {
       setIsOpen(true);
-      // setSelectedCategory(cId);
+
+      setSelectedCategoryDocId(docId);
+      setSelectedCategoryId(categoryId);
    }
 
    function closeModal() {
       setIsOpen(false);
    }
 
-   function onDelete(e) {
+   async function onDelete(e) {
       e.preventDefault();
+      const questionIds = new Set([]);
+      const reference = doc(db, "categories", selectedCategoryDocId);
+      console.log(selectedCategoryId);
+      const q = query(
+         questionsRef,
+         where("categoryId", "==", selectedCategoryId)
+      );
+      try {
+         const querySnapshot = await getDocs(q);
+         const qIds = querySnapshot.docs.map((doc) => {
+            return doc.data();
+         });
+
+         qIds.forEach((q) => {
+            questionIds.add(q.questionId);
+         });
+         const idsToDelete = Array.from(questionIds);
+         setQuestionIdsToDelete(idsToDelete);
+         deleteAnswersByQuestionId(questionIdsToDelete);
+         querySnapshot.docs.forEach(async (doc) => {
+            await deleteDoc(doc.ref);
+         });
+         await deleteDoc(reference);
+         // deleteDoc(doc.ref);
+      } catch (e) {
+         console.log("error: ", e.message);
+      }
 
       closeModal();
    }
@@ -75,7 +131,9 @@ function CategoryTable() {
                         </td>
                         <td>
                            <button
-                              onClick={() => openModal(category.categoryId)}
+                              onClick={() =>
+                                 openModal(category.id, category.categoryId)
+                              }
                            >
                               delete
                            </button>
