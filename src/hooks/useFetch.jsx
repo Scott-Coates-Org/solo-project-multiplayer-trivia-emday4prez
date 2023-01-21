@@ -32,10 +32,9 @@ export const useFetch = (endpoint, method = "GET") => {
             setIsLoading(false);
             setData(newData);
             setError(null);
-            console.log("fetched data", newData);
          } catch (error) {
             if (error.name === "AbortError") {
-               console.log("fetch aborted");
+               console.error("fetch aborted with controller");
                setError(error);
                setIsLoading(false);
             } else {

@@ -4,9 +4,9 @@ import { Routes, Route, Outlet, Link } from "react-router-dom";
 import CategoryTable from "./components/manage/CategoryTable";
 import QuestionsTable from "./components/manage/QuestionsTable";
 import AnswersTable from "./components/manage/AnswersTable";
-import questionsData from "./data/questions";
-import answersData from "./data/answers";
-import categoriesData from "./data/categories";
+
+import questionsData from "./data/questions.json";
+import categoriesData from "./data/categories.json";
 import { useFetch } from "./hooks/useFetch";
 export default function App() {
    return (
@@ -75,23 +75,13 @@ function Home() {
 }
 
 function Manage() {
-   const [selectedQuestion, setSelectedQuestion] = React.useState(null);
-   const [questions, setQuestions] = React.useState(questionsData);
-   const [answers, setAnswers] = React.useState(answersData);
-   const dbAnswers = useFetch(
-      "https://firestore.googleapis.com/v1/projects/multi-trivia-21ae9/databases/(default)/documents/answers/"
-   );
-
    return (
       <div>
          <h2>MGMT</h2>
-         <CategoryTable
-            questions={questions}
-            setQuestions={setQuestions}
-            answers={answers}
-            setAnswers={setAnswers}
-         />
-         <QuestionsTable
+
+         <CategoryTable />
+
+         {/* <QuestionsTable
             questions={questions}
             setQuestions={setQuestions}
             answers={answers}
@@ -104,7 +94,7 @@ function Manage() {
             setAnswers={setAnswers}
             selectedQuestion={selectedQuestion}
             setSelectedQuestion={setSelectedQuestion}
-         />
+         /> */}
       </div>
    );
 }

@@ -25,6 +25,7 @@ function QuestionsTable({
    function openModal(question) {
       setIsOpen(true);
       setSelectedQuestion(question.questionId);
+      console.log(answers);
    }
 
    function closeModal() {

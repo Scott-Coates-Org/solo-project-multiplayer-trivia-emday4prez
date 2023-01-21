@@ -1,7 +1,8 @@
-import categoriesData from "../../data/categories";
-import styles from "./CategoryTable.module.css";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import Modal from "react-modal";
+import { collection, getDocs } from "firebase/firestore";
+import "./CategoryTable.module.css";
+import { db } from "../../firebase/client";
 
 const customStyles = {
    content: {
@@ -14,15 +15,27 @@ const customStyles = {
    },
 };
 
-function CategoryTable({ answers, setAnswers, questions, setQuestions }) {
+function CategoryTable() {
    const [modalIsOpen, setIsOpen] = useState(false);
-   const [selectedCategory, setSelectedCategory] = useState(null);
+   const [categories, setCategories] = useState([]);
 
-   const [categories, setCategories] = useState(categoriesData);
+   const fetchPost = async () => {
+      await getDocs(collection(db, "categories")).then((querySnapshot) => {
+         const newData = querySnapshot.docs.map((doc) => ({
+            ...doc.data(),
+            id: doc.id,
+         }));
+         setCategories(newData);
+      });
+   };
+
+   useEffect(() => {
+      fetchPost();
+   }, []);
 
    function openModal(cId) {
       setIsOpen(true);
-      setSelectedCategory(cId);
+      // setSelectedCategory(cId);
    }
 
    function closeModal() {
@@ -31,11 +44,7 @@ function CategoryTable({ answers, setAnswers, questions, setQuestions }) {
 
    function onDelete(e) {
       e.preventDefault();
-      console.log("delete", selectedCategory);
-      const newCategories = categories.filter(
-         (c) => c.categoryId !== selectedCategory
-      );
-      setCategories(newCategories);
+
       closeModal();
    }
    Modal.setAppElement(document.getElementById("root"));
@@ -43,6 +52,7 @@ function CategoryTable({ answers, setAnswers, questions, setQuestions }) {
    return (
       <div>
          <h1>edit game categories</h1>
+
          <table>
             <thead>
                <tr>
@@ -54,23 +64,27 @@ function CategoryTable({ answers, setAnswers, questions, setQuestions }) {
                </tr>
             </thead>
             <tbody>
-               {categories.map((category) => (
-                  <tr key={category.categoryId}>
-                     <td>{category.categoryName}</td>
-                     <td>{category.questionCount}</td>
-                     <td>{category.lastUpdated}</td>
-                     <td>
-                        <button>select</button>
-                     </td>
-                     <td>
-                        <button onClick={() => openModal(category.categoryId)}>
-                           delete
-                        </button>
-                     </td>
-                  </tr>
-               ))}
+               {categories &&
+                  categories.map((category) => (
+                     <tr key={category.categoryId}>
+                        <td>{category.categoryName}</td>
+                        <td>{category.questionCount}</td>
+                        <td>{category.lastUpdated}</td>
+                        <td>
+                           <button>select</button>
+                        </td>
+                        <td>
+                           <button
+                              onClick={() => openModal(category.categoryId)}
+                           >
+                              delete
+                           </button>
+                        </td>
+                     </tr>
+                  ))}
             </tbody>
          </table>
+
          <Modal
             isOpen={modalIsOpen}
             onRequestClose={closeModal}
