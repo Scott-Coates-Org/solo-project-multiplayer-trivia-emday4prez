@@ -1,9 +1,9 @@
 import Modal from "react-modal";
 import { useState, useEffect } from "react";
-import { collection, getDocs } from "firebase/firestore";
+import { collection, getDocs, doc, deleteDoc } from "firebase/firestore";
 import { useCollection } from "../../hooks/useCollection";
 import { db } from "../../firebase/client";
-import { doc, deleteDoc } from "firebase/firestore";
+
 const customStyles = {
    content: {
       top: "50%",

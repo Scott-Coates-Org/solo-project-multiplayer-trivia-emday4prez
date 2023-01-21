@@ -1,6 +1,13 @@
 import { useState, useEffect } from "react";
 import Modal from "react-modal";
-import { collection, getDocs } from "firebase/firestore";
+import {
+   collection,
+   getDocs,
+   doc,
+   deleteDoc,
+   query,
+   where,
+} from "firebase/firestore";
 import { db } from "../../firebase/client";
 const customStyles = {
    content: {
@@ -13,12 +20,15 @@ const customStyles = {
    },
 };
 
-function QuestionsTable() {
+function QuestionsTable({ selectedQuestionId, setSelectedQuestionId }) {
    const [modalIsOpen, setIsOpen] = useState(false);
    const [questions, setQuestions] = useState([]);
 
+   const questionsRef = collection(db, "questions");
+   const answersRef = collection(db, "answers");
+
    const fetchPost = async () => {
-      await getDocs(collection(db, "questions")).then((querySnapshot) => {
+      await getDocs(questionsRef).then((querySnapshot) => {
          const newData = querySnapshot.docs.map((doc) => ({
             ...doc.data(),
             id: doc.id,
@@ -33,22 +43,28 @@ function QuestionsTable() {
 
    function openModal(question) {
       setIsOpen(true);
+      setSelectedQuestionId(question.id);
    }
 
    function closeModal() {
       setIsOpen(false);
    }
 
-   function onDelete(e) {
+   async function onDelete(e) {
       e.preventDefault();
-      // const newQuestions = questions.filter(
-      //    (q) => q.questionId !== selectedQuestion
-      // );
-      // setQuestions(newQuestions);
-      // const newAnswers = answers.filter(
-      //    (a) => a.questionId !== selectedQuestion
-      // );
-      // setAnswers(newAnswers);
+
+      const reference = doc(db, "questions", selectedQuestionId);
+      // await deleteDoc(reference);
+      const q = query(
+         answersRef,
+         where("questionId", "==", `quest_${selectedQuestionId}`)
+      );
+      await getDocs(q).then((querySnapshot) => {
+         querySnapshot.docs.forEach((doc) => {
+            deleteDoc(doc.ref);
+         });
+      });
+
       closeModal();
    }
    Modal.setAppElement(document.getElementById("root"));
