@@ -24,7 +24,6 @@ function QuestionsTable() {
             id: doc.id,
          }));
          setQuestions(newData);
-         console.log("questions", newData);
       });
    };
 

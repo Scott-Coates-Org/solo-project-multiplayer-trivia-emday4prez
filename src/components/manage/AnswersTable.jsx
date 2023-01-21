@@ -1,7 +1,9 @@
 import Modal from "react-modal";
 import { useState, useEffect } from "react";
 import { collection, getDocs } from "firebase/firestore";
+import { useCollection } from "../../hooks/useCollection";
 import { db } from "../../firebase/client";
+import { doc, deleteDoc } from "firebase/firestore";
 const customStyles = {
    content: {
       top: "50%",
@@ -13,8 +15,12 @@ const customStyles = {
    },
 };
 function AnswersTable({ selectedQuestion, setSelectedQuestion }) {
+   const { documents: answers } = useCollection("answers");
+   console.log(answers);
+
    const [modalIsOpen, setIsOpen] = useState(false);
-   const [answers, setAnswers] = useState([]);
+   const [answersData, setAnswersData] = useState([]);
+   const [Id, setId] = useState("");
 
    const fetchPost = async () => {
       await getDocs(collection(db, "answers")).then((querySnapshot) => {
@@ -22,29 +28,28 @@ function AnswersTable({ selectedQuestion, setSelectedQuestion }) {
             ...doc.data(),
             id: doc.id,
          }));
-         setAnswers(newData);
+         setAnswersData(newData);
       });
    };
 
    useEffect(() => {
       fetchPost();
-   }, []);
+   }, [answers]);
 
-   function openModal(answer) {
+   function openModal(id) {
       setIsOpen(true);
-      //setSelectedAnswer(answer.answerId);
+      setId(id);
    }
 
    function closeModal() {
       setIsOpen(false);
    }
 
-   function onDelete(e) {
-      e.preventDefault();
-      // const newAnswers = answers.filter(
-      //    (answer) => answer.answerId !== selectedAnswer
-      // );
-      // setAnswers(newAnswers);
+   async function onDelete(id) {
+      const reference = doc(db, "answers", id);
+      console.log("refer", reference);
+      await deleteDoc(reference);
+
       closeModal();
    }
    Modal.setAppElement(document.getElementById("root"));
@@ -61,8 +66,8 @@ function AnswersTable({ selectedQuestion, setSelectedQuestion }) {
                </tr>
             </thead>
             <tbody>
-               {answers &&
-                  answers
+               {answersData &&
+                  answersData
                      //.filter((answer) => answer.questionId === selectedQuestion)
                      .map((answer) => (
                         <tr key={answer.answerId}>
@@ -79,7 +84,7 @@ function AnswersTable({ selectedQuestion, setSelectedQuestion }) {
                            </td>
                            <td>
                               <div>
-                                 <button onClick={() => openModal(answer)}>
+                                 <button onClick={() => openModal(answer.id)}>
                                     delete
                                  </button>
                               </div>
@@ -96,10 +101,10 @@ function AnswersTable({ selectedQuestion, setSelectedQuestion }) {
          >
             <h2>delete answer</h2>
             <div>are you sure you want to delete</div>
-            <form>
+            <div>
                <button onClick={closeModal}>cancel</button>
-               <button onClick={onDelete}>delete</button>
-            </form>
+               <button onClick={() => onDelete(Id)}>delete</button>
+            </div>
          </Modal>
       </div>
    );
