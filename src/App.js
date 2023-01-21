@@ -5,9 +5,6 @@ import CategoryTable from "./components/manage/CategoryTable";
 import QuestionsTable from "./components/manage/QuestionsTable";
 import AnswersTable from "./components/manage/AnswersTable";
 
-import questionsData from "./data/questions.json";
-import categoriesData from "./data/categories.json";
-import { useFetch } from "./hooks/useFetch";
 export default function App() {
    return (
       <div>

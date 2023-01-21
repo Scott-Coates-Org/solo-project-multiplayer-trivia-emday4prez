@@ -44,9 +44,9 @@ function AnswersTable({ selectedQuestion, setSelectedQuestion }) {
       setIsOpen(false);
    }
 
-   async function onDelete(id) {
-      const reference = doc(db, "answers", id);
-      console.log("refer", reference);
+   async function onDelete(e) {
+      e.preventDefault();
+      const reference = doc(db, "answers", Id);
       await deleteDoc(reference);
 
       closeModal();
@@ -102,7 +102,7 @@ function AnswersTable({ selectedQuestion, setSelectedQuestion }) {
             <div>are you sure you want to delete</div>
             <div>
                <button onClick={closeModal}>cancel</button>
-               <button onClick={() => onDelete(Id)}>delete</button>
+               <button onClick={onDelete}>delete</button>
             </div>
          </Modal>
       </div>
