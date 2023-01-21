@@ -16,7 +16,6 @@ const customStyles = {
 };
 function AnswersTable({ selectedQuestion, setSelectedQuestion }) {
    const { documents: answers } = useCollection("answers");
-   console.log(answers);
 
    const [modalIsOpen, setIsOpen] = useState(false);
    const [answersData, setAnswersData] = useState([]);
