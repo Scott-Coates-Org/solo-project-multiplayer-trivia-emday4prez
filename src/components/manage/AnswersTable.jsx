@@ -14,26 +14,26 @@ const customStyles = {
       transform: "translate(-50%, -50%)",
    },
 };
-function AnswersTable({ selectedQuestion, setSelectedQuestion }) {
-   const { documents: answers } = useCollection("answers");
+function AnswersTable() {
+   //const { documents: answers } = useCollection("answers");
 
    const [modalIsOpen, setIsOpen] = useState(false);
    const [answersData, setAnswersData] = useState([]);
    const [Id, setId] = useState("");
 
-   const fetchPost = async () => {
-      await getDocs(collection(db, "answers")).then((querySnapshot) => {
-         const newData = querySnapshot.docs.map((doc) => ({
-            ...doc.data(),
-            id: doc.id,
-         }));
-         setAnswersData(newData);
-      });
-   };
+   // const fetchPost = async () => {
+   //    await getDocs(collection(db, "answers")).then((querySnapshot) => {
+   //       const newData = querySnapshot.docs.map((doc) => ({
+   //          ...doc.data(),
+   //          id: doc.id,
+   //       }));
+   //       setAnswersData(newData);
+   //    });
+   // };
 
-   useEffect(() => {
-      fetchPost();
-   }, [answers]);
+   // useEffect(() => {
+   //    fetchPost();
+   // }, [answers]);
 
    function openModal(id) {
       setIsOpen(true);

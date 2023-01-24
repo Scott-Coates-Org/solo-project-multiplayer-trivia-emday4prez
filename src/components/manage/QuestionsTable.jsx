@@ -24,22 +24,22 @@ function QuestionsTable({ selectedQuestionId, setSelectedQuestionId }) {
    const [modalIsOpen, setIsOpen] = useState(false);
    const [questions, setQuestions] = useState([]);
 
-   const questionsRef = collection(db, "questions");
-   const answersRef = collection(db, "answers");
+   // const questionsRef = collection(db, "questions");
+   // const answersRef = collection(db, "answers");
 
-   const fetchPost = async () => {
-      await getDocs(questionsRef).then((querySnapshot) => {
-         const newData = querySnapshot.docs.map((doc) => ({
-            ...doc.data(),
-            id: doc.id,
-         }));
-         setQuestions(newData);
-      });
-   };
+   // const fetchPost = async () => {
+   //    await getDocs(questionsRef).then((querySnapshot) => {
+   //       const newData = querySnapshot.docs.map((doc) => ({
+   //          ...doc.data(),
+   //          id: doc.id,
+   //       }));
+   //       setQuestions(newData);
+   //    });
+   // };
 
-   useEffect(() => {
-      fetchPost();
-   }, [questionsRef]);
+   // useEffect(() => {
+   //    fetchPost();
+   // }, [questionsRef]);
 
    function openModal(question) {
       setIsOpen(true);
@@ -53,17 +53,17 @@ function QuestionsTable({ selectedQuestionId, setSelectedQuestionId }) {
    async function onDelete(e) {
       e.preventDefault();
 
-      const reference = doc(db, "questions", selectedQuestionId);
-      await deleteDoc(reference);
-      const q = query(
-         answersRef,
-         where("questionId", "==", `quest_${selectedQuestionId}`)
-      );
-      await getDocs(q).then((querySnapshot) => {
-         querySnapshot.docs.forEach((doc) => {
-            deleteDoc(doc.ref);
-         });
-      });
+      // const reference = doc(db, "questions", selectedQuestionId);
+      // await deleteDoc(reference);
+      // const q = query(
+      //    answersRef,
+      //    where("questionId", "==", `quest_${selectedQuestionId}`)
+      // );
+      // await getDocs(q).then((querySnapshot) => {
+      //    querySnapshot.docs.forEach((doc) => {
+      //       deleteDoc(doc.ref);
+      //    });
+      // });
 
       closeModal();
    }
