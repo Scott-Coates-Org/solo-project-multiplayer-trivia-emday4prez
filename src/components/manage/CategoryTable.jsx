@@ -4,12 +4,13 @@ import {
    collection,
    getDocs,
    doc,
+   setDoc,
+   Timestamp,
    deleteDoc,
    query,
    where,
 } from "firebase/firestore";
 import { db } from "../../firebase/client";
-import { useCollection } from "../../hooks/useCollection";
 import "./CategoryTable.module.css";
 
 const customStyles = {
@@ -24,11 +25,13 @@ const customStyles = {
 };
 
 function CategoryTable() {
+   console.log("render");
    const [modalIsOpen, setIsOpen] = useState(false);
    const [categories, setCategories] = useState([]);
    const [selectedCategoryDocId, setSelectedCategoryDocId] = useState("");
    const [selectedCategoryId, setSelectedCategoryId] = useState("");
    const [questionIdsToDelete, setQuestionIdsToDelete] = useState([]);
+   const [addCategoryInput, setAddCategoryInput] = useState("");
 
    const questionsRef = collection(db, "questions");
    const answersRef = collection(db, "answers");
@@ -43,13 +46,12 @@ function CategoryTable() {
          setCategories(newData);
       });
    };
-   fetchPost();
-   // useEffect(() => {
-   //    fetchPost();
-   // }, [categoriesRef.docs]);
+
+   useEffect(() => {
+      fetchPost();
+   }, [categoriesRef]);
 
    async function deleteAnswersByQuestionId(arrayOfIds) {
-      console.log("arrayofids", arrayOfIds);
       for (let id of arrayOfIds) {
          const answerQuery = query(answersRef, where("questionId", "==", id));
          const querySnapshot = await getDocs(answerQuery);
@@ -103,6 +105,20 @@ function CategoryTable() {
 
       closeModal();
    }
+
+   const addCategory = async () => {
+      if (addCategoryInput.length < 3) {
+         alert("categories must be at least two letters");
+         return;
+      }
+      await setDoc(doc(db, "categories", addCategoryInput), {
+         categoryName: addCategoryInput,
+         categoryId: `cat_${categories.length + 1}`,
+         lastUpdated: Timestamp.fromDate(new Date()),
+      });
+      setAddCategoryInput("");
+   };
+
    Modal.setAppElement(document.getElementById("root"));
 
    return (
@@ -125,7 +141,7 @@ function CategoryTable() {
                      <tr key={category.categoryId}>
                         <td>{category.categoryName}</td>
                         <td>{category.questionCount}</td>
-                        <td>{category.lastUpdated}</td>
+                        {/* <td>{category.lastUpdated}</td> */}
                         <td>
                            <button>select</button>
                         </td>
@@ -140,6 +156,18 @@ function CategoryTable() {
                         </td>
                      </tr>
                   ))}
+               <tr>
+                  <td>
+                     <input
+                        type="text"
+                        value={addCategoryInput}
+                        onChange={(e) => setAddCategoryInput(e.target.value)}
+                     ></input>
+                  </td>
+                  <td>
+                     <button onClick={addCategory}>add</button>
+                  </td>
+               </tr>
             </tbody>
          </table>
 
