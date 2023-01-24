@@ -33,35 +33,35 @@ function CategoryTable() {
    const [questionIdsToDelete, setQuestionIdsToDelete] = useState([]);
    const [addCategoryInput, setAddCategoryInput] = useState("");
 
-   const questionsRef = collection(db, "questions");
-   const answersRef = collection(db, "answers");
-   const categoriesRef = collection(db, "categories");
+   //const questionsRef = collection(db, "questions");
+   //const answersRef = collection(db, "answers");
+   //const categoriesRef = collection(db, "categories");
 
-   const fetchPost = async () => {
-      await getDocs(categoriesRef).then((querySnapshot) => {
-         const newData = querySnapshot.docs.map((doc) => ({
-            ...doc.data(),
-            id: doc.id,
-         }));
-         setCategories(newData);
-      });
-   };
+   // const fetchPost = async () => {
+   //    await getDocs(categoriesRef).then((querySnapshot) => {
+   //       const newData = querySnapshot.docs.map((doc) => ({
+   //          ...doc.data(),
+   //          id: doc.id,
+   //       }));
+   //       setCategories(newData);
+   //    });
+   // };
 
-   useEffect(() => {
-      fetchPost();
-   }, [categoriesRef]);
+   // useEffect(() => {
+   //    fetchPost();
+   // }, [categoriesRef]);
 
-   async function deleteAnswersByQuestionId(arrayOfIds) {
-      for (let id of arrayOfIds) {
-         const answerQuery = query(answersRef, where("questionId", "==", id));
-         const querySnapshot = await getDocs(answerQuery);
-         querySnapshot.docs.forEach(async (doc) => {
-            await deleteDoc(doc.ref);
-         });
-      }
+   // async function deleteAnswersByQuestionId(arrayOfIds) {
+   //    for (let id of arrayOfIds) {
+   //       const answerQuery = query(answersRef, where("questionId", "==", id));
+   //       const querySnapshot = await getDocs(answerQuery);
+   //       querySnapshot.docs.forEach(async (doc) => {
+   //          await deleteDoc(doc.ref);
+   //       });
+   //    }
 
-      return;
-   }
+   //    return;
+   // }
    function openModal(docId, categoryId) {
       setIsOpen(true);
 
@@ -75,33 +75,33 @@ function CategoryTable() {
 
    async function onDelete(e) {
       e.preventDefault();
-      const questionIds = new Set([]);
-      const reference = doc(db, "categories", selectedCategoryDocId);
-      console.log(selectedCategoryId);
-      const q = query(
-         questionsRef,
-         where("categoryId", "==", selectedCategoryId)
-      );
-      try {
-         const querySnapshot = await getDocs(q);
-         const qIds = querySnapshot.docs.map((doc) => {
-            return doc.data();
-         });
+      // const questionIds = new Set([]);
+      // const reference = doc(db, "categories", selectedCategoryDocId);
+      // console.log(selectedCategoryId);
+      // const q = query(
+      //    questionsRef,
+      //    where("categoryId", "==", selectedCategoryId)
+      // );
+      // try {
+      //    const querySnapshot = await getDocs(q);
+      //    const qIds = querySnapshot.docs.map((doc) => {
+      //       return doc.data();
+      //    });
 
-         qIds.forEach((q) => {
-            questionIds.add(q.questionId);
-         });
-         const idsToDelete = Array.from(questionIds);
-         setQuestionIdsToDelete(idsToDelete);
-         deleteAnswersByQuestionId(questionIdsToDelete);
-         querySnapshot.docs.forEach(async (doc) => {
-            await deleteDoc(doc.ref);
-         });
-         await deleteDoc(reference);
-         // deleteDoc(doc.ref);
-      } catch (e) {
-         console.log("error: ", e.message);
-      }
+      //    qIds.forEach((q) => {
+      //       questionIds.add(q.questionId);
+      //    });
+      //    const idsToDelete = Array.from(questionIds);
+      //    setQuestionIdsToDelete(idsToDelete);
+      //    deleteAnswersByQuestionId(questionIdsToDelete);
+      //    querySnapshot.docs.forEach(async (doc) => {
+      //       await deleteDoc(doc.ref);
+      //    });
+      //    await deleteDoc(reference);
+      //    // deleteDoc(doc.ref);
+      // } catch (e) {
+      //    console.log("error: ", e.message);
+      // }
 
       closeModal();
    }
@@ -111,11 +111,11 @@ function CategoryTable() {
          alert("categories must be at least two letters");
          return;
       }
-      await setDoc(doc(db, "categories", addCategoryInput), {
-         categoryName: addCategoryInput,
-         categoryId: `cat_${categories.length + 1}`,
-         lastUpdated: Timestamp.fromDate(new Date()),
-      });
+      // await setDoc(doc(db, "categories", addCategoryInput), {
+      //    categoryName: addCategoryInput,
+      //    categoryId: `cat_${categories.length + 1}`,
+      //    lastUpdated: Timestamp.fromDate(new Date()),
+      // });
       setAddCategoryInput("");
    };
 
@@ -181,7 +181,7 @@ function CategoryTable() {
             <div>are you sure you want to delete</div>
             <form>
                <button onClick={closeModal}>cancel</button>
-               <button onClick={onDelete}>delete</button>
+               {/* <button onClick={onDelete}>delete</button> */}
             </form>
          </Modal>
       </div>

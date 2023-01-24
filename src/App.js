@@ -1,14 +1,14 @@
 import DbTest from "./components/db-test";
 import * as React from "react";
 import { Routes, Route, Outlet, Link } from "react-router-dom";
-import CategoryTable from "./components/manage/CategoryTable";
-import QuestionsTable from "./components/manage/QuestionsTable";
-import AnswersTable from "./components/manage/AnswersTable";
+import Manage from "./components/manage/ManagePage";
+import Home from "./components/home/HomePage";
+import Layout from "./components/Layout";
 
 export default function App() {
    return (
       <div>
-         <h1>Basic Example</h1>
+         <h1>Trivia</h1>
 
          <p>
             This example demonstrates some of the core features of React Router
@@ -32,64 +32,7 @@ export default function App() {
                <Route path="*" element={<NoMatch />} />
             </Route>
          </Routes>
-         <DbTest />
-      </div>
-   );
-}
-
-function Layout() {
-   return (
-      <div>
-         {/* A "layout route" is a good place to put markup you want to
-          share across all the pages on your site, like navigation. */}
-         <nav>
-            <ul>
-               <li>
-                  <Link to="/">Home</Link>
-               </li>
-               <li>
-                  <Link to="/manage">manage</Link>
-               </li>
-            </ul>
-         </nav>
-
-         <hr />
-
-         {/* An <Outlet> renders whatever child route is currently active,
-          so you can think about this <Outlet> as a placeholder for
-          the child routes we defined above. */}
-         <Outlet />
-      </div>
-   );
-}
-
-function Home() {
-   return (
-      <div>
-         <h2>Home</h2>
-      </div>
-   );
-}
-
-function Manage() {
-   const [selectedQuestionId, setSelectedQuestionId] = React.useState("");
-   return (
-      <div>
-         <h2>MGMT</h2>
-
-         <CategoryTable
-            selectedQuestionId={selectedQuestionId}
-            setSelectedQuestionId={setSelectedQuestionId}
-         />
-
-         <QuestionsTable
-            selectedQuestionId={selectedQuestionId}
-            setSelectedQuestionId={setSelectedQuestionId}
-         />
-         <AnswersTable
-            selectedQuestionId={selectedQuestionId}
-            setSelectedQuestionId={setSelectedQuestionId}
-         />
+         {/* <DbTest /> */}
       </div>
    );
 }
