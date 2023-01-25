@@ -62,7 +62,6 @@ function QuestionsTable({
    }
 
    async function addQuestion() {
-      setQuestionToAdd(inputRef.current.value);
       if (!selectedCategoryId) {
          alert("please select a category first");
          return;
@@ -71,14 +70,11 @@ function QuestionsTable({
          alert("Questions must be at least 10 characters long");
          return;
       }
-      console.log(inputRef.current.value);
 
       await addDoc(collection(db, "questions"), {
-         questionContent: questionToAdd,
+         questionContent: inputRef.current.value,
          categoryId: selectedCategoryId,
-         questionId: `quest_${Math.floor(
-            Math.random() * 1000000000
-         ).toString()}`,
+         questionId: `quest_${Math.floor(Math.random() * 10000000).toString()}`,
       });
       inputRef.current.value = "";
    }
