@@ -34,35 +34,7 @@ function CategoryTable({
    const [categoryDocId, setCategoryDocId] = useState("");
    const [categoryToAdd, setCategoryToAdd] = useState("");
    const inputRef = useRef();
-   //const questionsRef = collection(db, "questions");
-   //const answersRef = collection(db, "answers");
-   //const categoriesRef = collection(db, "categories");
 
-   // const fetchPost = async () => {
-   //    await getDocs(categoriesRef).then((querySnapshot) => {
-   //       const newData = querySnapshot.docs.map((doc) => ({
-   //          ...doc.data(),
-   //          id: doc.id,
-   //       }));
-   //       setCategories(newData);
-   //    });
-   // };
-
-   // useEffect(() => {
-   //    fetchPost();
-   // }, [categoriesRef]);
-
-   // async function deleteAnswersByQuestionId(arrayOfIds) {
-   //    for (let id of arrayOfIds) {
-   //       const answerQuery = query(answersRef, where("questionId", "==", id));
-   //       const querySnapshot = await getDocs(answerQuery);
-   //       querySnapshot.docs.forEach(async (doc) => {
-   //          await deleteDoc(doc.ref);
-   //       });
-   //    }
-
-   //    return;
-   // }
    function openModal(categoryId, categoryDocId, selectedQuestionId) {
       setIsOpen(true);
       setSelectedCategoryId(categoryId);
@@ -100,18 +72,24 @@ function CategoryTable({
    }
 
    const addCategory = async () => {
+      setCategoryToAdd(inputRef.current.value);
       if (inputRef.current.value.length < 3) {
          alert("Category name must be at least 3 characters long");
          return;
       }
-      setCategoryToAdd(inputRef.current.value);
 
-      await setDoc(doc(db, "categories", categoryToAdd), {
-         categoryName: categoryToAdd,
+      const docData = {
+         categoryName: inputRef.current.value,
          questionCount: 0,
          lastUpdated: new Date().toLocaleString(),
-         categoryId: Math.floor(Math.random() * 1000000000).toString(),
-      });
+         categoryId: Math.floor(Math.random() * 1000000).toString(),
+      };
+      try {
+         await setDoc(doc(db, "categories", inputRef.current.value), docData);
+      } catch (e) {
+         console.error(e);
+      }
+
       inputRef.current.value = "";
    };
 

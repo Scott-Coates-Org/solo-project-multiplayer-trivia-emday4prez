@@ -23,20 +23,6 @@ function AnswersTable({
    console.log("rendered answers", answers);
    const [modalIsOpen, setIsOpen] = useState(false);
 
-   // const fetchPost = async () => {
-   //    await getDocs(collection(db, "answers")).then((querySnapshot) => {
-   //       const newData = querySnapshot.docs.map((doc) => ({
-   //          ...doc.data(),
-   //          id: doc.id,
-   //       }));
-   //       setAnswersData(newData);
-   //    });
-   // };
-
-   // useEffect(() => {
-   //    fetchPost();
-   // }, [answers]);
-
    function openModal(answer) {
       setIsOpen(true);
       setSelectedAnswerDocId(answer.id);
