@@ -6,6 +6,7 @@ import Home from "./components/home/HomePage";
 import Layout from "./components/Layout";
 
 export default function App() {
+   console.log("render app");
    return (
       <div>
          <h1>Trivia</h1>

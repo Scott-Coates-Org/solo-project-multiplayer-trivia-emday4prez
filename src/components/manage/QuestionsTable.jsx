@@ -20,10 +20,15 @@ const customStyles = {
    },
 };
 
-function QuestionsTable({ selectedQuestionId, setSelectedQuestionId }) {
+function QuestionsTable({
+   questions,
+   selectedCategoryId,
+   selectedQuestionId,
+   setSelectedQuestionId,
+}) {
+   console.log("render questions table");
    const [modalIsOpen, setIsOpen] = useState(false);
-   const [questions, setQuestions] = useState([]);
-
+   const [questionDocId, setQuestionDocId] = useState("");
    // const questionsRef = collection(db, "questions");
    // const answersRef = collection(db, "answers");
 
@@ -44,6 +49,7 @@ function QuestionsTable({ selectedQuestionId, setSelectedQuestionId }) {
    function openModal(question) {
       setIsOpen(true);
       setSelectedQuestionId(question.id);
+      setQuestionDocId(question.id);
    }
 
    function closeModal() {
@@ -53,26 +59,21 @@ function QuestionsTable({ selectedQuestionId, setSelectedQuestionId }) {
    async function onDelete(e) {
       e.preventDefault();
 
-      // const reference = doc(db, "questions", selectedQuestionId);
-      // await deleteDoc(reference);
-      // const q = query(
-      //    answersRef,
-      //    where("questionId", "==", `quest_${selectedQuestionId}`)
-      // );
-      // await getDocs(q).then((querySnapshot) => {
-      //    querySnapshot.docs.forEach((doc) => {
-      //       deleteDoc(doc.ref);
-      //    });
-      // });
+      const q = query(
+         collection(db, "answers"),
+         where("questionId", "==", selectedQuestionId)
+      );
 
+      const querySnapshot = await getDocs(q);
+      querySnapshot.forEach(async (doc) => {
+         // doc.data() is never undefined for query doc snapshots
+         await deleteDoc(doc(db, "answers", doc.id));
+      });
+
+      await deleteDoc(doc(db, "questions", questionDocId));
       closeModal();
    }
    Modal.setAppElement(document.getElementById("root"));
-
-   const handleClick = (question) => {
-      console.log("questionId: ", question.questionId);
-      // setSelectedQuestion(question.questionId);
-   };
 
    return (
       <div>
@@ -88,21 +89,27 @@ function QuestionsTable({ selectedQuestionId, setSelectedQuestionId }) {
             </thead>
             <tbody>
                {questions &&
-                  questions.map((question) => (
-                     <tr key={question.questionId}>
-                        <td>{question.questionContent}</td>
-                        <td>
-                           <button onClick={() => handleClick(question)}>
-                              select
-                           </button>{" "}
-                        </td>
-                        <td>
-                           <button onClick={() => openModal(question)}>
-                              delete
-                           </button>
-                        </td>
-                     </tr>
-                  ))}
+                  questions
+                     .filter((q) => q.categoryId === selectedCategoryId)
+                     .map((question) => (
+                        <tr key={question.questionId}>
+                           <td>{question.questionContent}</td>
+                           <td>
+                              <button
+                                 onClick={() =>
+                                    setSelectedQuestionId(question.questionId)
+                                 }
+                              >
+                                 select
+                              </button>{" "}
+                           </td>
+                           <td>
+                              <button onClick={() => openModal(question)}>
+                                 delete
+                              </button>
+                           </td>
+                        </tr>
+                     ))}
             </tbody>
          </table>
          <Modal

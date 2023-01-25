@@ -1,14 +1,13 @@
-import { useState, useEffect } from "react";
+import { useState, useRef } from "react";
 import Modal from "react-modal";
 import {
+   query,
+   doc,
+   where,
+   deleteDoc,
    collection,
    getDocs,
-   doc,
    setDoc,
-   Timestamp,
-   deleteDoc,
-   query,
-   where,
 } from "firebase/firestore";
 import { db } from "../../firebase/client";
 import "./CategoryTable.module.css";
@@ -24,15 +23,17 @@ const customStyles = {
    },
 };
 
-function CategoryTable() {
-   console.log("render");
-   const [modalIsOpen, setIsOpen] = useState(false);
-   const [categories, setCategories] = useState([]);
-   const [selectedCategoryDocId, setSelectedCategoryDocId] = useState("");
-   const [selectedCategoryId, setSelectedCategoryId] = useState("");
-   const [questionIdsToDelete, setQuestionIdsToDelete] = useState([]);
-   const [addCategoryInput, setAddCategoryInput] = useState("");
+function CategoryTable({
+   categories,
+   selectedCategoryId,
+   setSelectedCategoryId,
+}) {
+   console.log("render categories", categories);
 
+   const [modalIsOpen, setIsOpen] = useState(false);
+   const [categoryDocId, setCategoryDocId] = useState("");
+   const [categoryToAdd, setCategoryToAdd] = useState("");
+   const inputRef = useRef();
    //const questionsRef = collection(db, "questions");
    //const answersRef = collection(db, "answers");
    //const categoriesRef = collection(db, "categories");
@@ -62,11 +63,10 @@ function CategoryTable() {
 
    //    return;
    // }
-   function openModal(docId, categoryId) {
+   function openModal(categoryId, categoryDocId, selectedQuestionId) {
       setIsOpen(true);
-
-      setSelectedCategoryDocId(docId);
       setSelectedCategoryId(categoryId);
+      setCategoryDocId(categoryDocId);
    }
 
    function closeModal() {
@@ -74,7 +74,29 @@ function CategoryTable() {
    }
 
    async function onDelete(e) {
+      const questionIds = new Set([]);
       e.preventDefault();
+      const q = query(
+         collection(db, "questions"),
+         where("categoryId", "==", selectedCategoryId)
+      );
+      const querySnapshot = await getDocs(q);
+      querySnapshot.docs.forEach(async (doc) => {
+         const data = doc.data();
+         questionIds.add(data.questionId);
+         await deleteDoc(doc.ref);
+      });
+      const answersQuery = query(
+         collection(db, "answers"),
+         where("questionId", "in", Array.from(questionIds))
+      );
+      const answersQuerySnapshot = await getDocs(answersQuery);
+      answersQuerySnapshot.docs.forEach(async (doc) => {
+         await deleteDoc(doc.ref);
+      });
+
+      await deleteDoc(doc(db, "categories", categoryDocId));
+      closeModal();
       // const questionIds = new Set([]);
       // const reference = doc(db, "categories", selectedCategoryDocId);
       // console.log(selectedCategoryId);
@@ -102,21 +124,22 @@ function CategoryTable() {
       // } catch (e) {
       //    console.log("error: ", e.message);
       // }
-
-      closeModal();
    }
 
    const addCategory = async () => {
-      if (addCategoryInput.length < 3) {
-         alert("categories must be at least two letters");
+      if (inputRef.current.value.length < 3) {
+         alert("Category name must be at least 3 characters long");
          return;
       }
-      // await setDoc(doc(db, "categories", addCategoryInput), {
-      //    categoryName: addCategoryInput,
-      //    categoryId: `cat_${categories.length + 1}`,
-      //    lastUpdated: Timestamp.fromDate(new Date()),
-      // });
-      setAddCategoryInput("");
+      setCategoryToAdd(inputRef.current.value);
+
+      await setDoc(doc(db, "categories", categoryToAdd), {
+         categoryName: categoryToAdd,
+         questionCount: 0,
+         lastUpdated: new Date().toLocaleString(),
+         categoryId: Math.floor(Math.random() * 1000000000).toLocaleString(),
+      });
+      inputRef.current.value = "";
    };
 
    Modal.setAppElement(document.getElementById("root"));
@@ -141,14 +164,20 @@ function CategoryTable() {
                      <tr key={category.categoryId}>
                         <td>{category.categoryName}</td>
                         <td>{category.questionCount}</td>
-                        {/* <td>{category.lastUpdated}</td> */}
+                        <td>{category.lastUpdated}</td>
                         <td>
-                           <button>select</button>
+                           <button
+                              onClick={() =>
+                                 setSelectedCategoryId(category.categoryId)
+                              }
+                           >
+                              select
+                           </button>
                         </td>
                         <td>
                            <button
                               onClick={() =>
-                                 openModal(category.id, category.categoryId)
+                                 openModal(category.categoryId, category.id)
                               }
                            >
                               delete
@@ -158,11 +187,7 @@ function CategoryTable() {
                   ))}
                <tr>
                   <td>
-                     <input
-                        type="text"
-                        value={addCategoryInput}
-                        onChange={(e) => setAddCategoryInput(e.target.value)}
-                     ></input>
+                     <input type="text" ref={inputRef}></input>
                   </td>
                   <td>
                      <button onClick={addCategory}>add</button>
@@ -181,7 +206,7 @@ function CategoryTable() {
             <div>are you sure you want to delete</div>
             <form>
                <button onClick={closeModal}>cancel</button>
-               {/* <button onClick={onDelete}>delete</button> */}
+               <button onClick={onDelete}>delete</button>
             </form>
          </Modal>
       </div>
