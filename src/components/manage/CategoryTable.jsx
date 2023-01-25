@@ -97,33 +97,6 @@ function CategoryTable({
 
       await deleteDoc(doc(db, "categories", categoryDocId));
       closeModal();
-      // const questionIds = new Set([]);
-      // const reference = doc(db, "categories", selectedCategoryDocId);
-      // console.log(selectedCategoryId);
-      // const q = query(
-      //    questionsRef,
-      //    where("categoryId", "==", selectedCategoryId)
-      // );
-      // try {
-      //    const querySnapshot = await getDocs(q);
-      //    const qIds = querySnapshot.docs.map((doc) => {
-      //       return doc.data();
-      //    });
-
-      //    qIds.forEach((q) => {
-      //       questionIds.add(q.questionId);
-      //    });
-      //    const idsToDelete = Array.from(questionIds);
-      //    setQuestionIdsToDelete(idsToDelete);
-      //    deleteAnswersByQuestionId(questionIdsToDelete);
-      //    querySnapshot.docs.forEach(async (doc) => {
-      //       await deleteDoc(doc.ref);
-      //    });
-      //    await deleteDoc(reference);
-      //    // deleteDoc(doc.ref);
-      // } catch (e) {
-      //    console.log("error: ", e.message);
-      // }
    }
 
    const addCategory = async () => {
@@ -137,7 +110,7 @@ function CategoryTable({
          categoryName: categoryToAdd,
          questionCount: 0,
          lastUpdated: new Date().toLocaleString(),
-         categoryId: Math.floor(Math.random() * 1000000000).toLocaleString(),
+         categoryId: Math.floor(Math.random() * 1000000000).toString(),
       });
       inputRef.current.value = "";
    };
