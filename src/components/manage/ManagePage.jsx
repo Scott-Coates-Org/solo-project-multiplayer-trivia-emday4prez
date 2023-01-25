@@ -8,6 +8,8 @@ function Manage() {
    const [selectedQuestionId, setSelectedQuestionId] = useState("");
    const [selectedCategoryId, setSelectedCategoryId] = useState("");
    const { documents: categories } = useCollection("categories");
+   const { documents: questions } = useCollection("questions");
+   const { documents: answers } = useCollection("answers");
    return (
       <div>
          <h2>MGMT</h2>
@@ -19,12 +21,14 @@ function Manage() {
          />
 
          <QuestionsTable
+            questions={questions}
+            selectedCategoryId={selectedCategoryId}
             selectedQuestionId={selectedQuestionId}
             setSelectedQuestionId={setSelectedQuestionId}
          />
          <AnswersTable
+            answers={answers}
             selectedQuestionId={selectedQuestionId}
-            setSelectedQuestionId={setSelectedQuestionId}
          />
       </div>
    );

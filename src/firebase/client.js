@@ -1,5 +1,5 @@
 import { initializeApp } from "firebase/app";
-import { getFirestore } from "firebase/firestore";
+import { getFirestore, doc, deleteDoc } from "firebase/firestore";
 
 const firebaseKey = process.env.REACT_APP_FIREBASE_API_KEY;
 const firebaseProjectId = process.env.REACT_APP_FIREBASE_PROJECT_ID;
@@ -21,3 +21,8 @@ if (keysWithEmptyValues)
 
 export const app = initializeApp(firebaseConfig);
 export const db = getFirestore(app);
+
+export const findAndDelete = async (collection, id) => {
+   const docRef = doc(db, collection, id);
+   await deleteDoc(docRef);
+};

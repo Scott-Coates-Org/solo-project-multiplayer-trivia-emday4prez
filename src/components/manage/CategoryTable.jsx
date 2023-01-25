@@ -129,7 +129,7 @@ function CategoryTable({
                      <tr key={category.categoryId}>
                         <td>{category.categoryName}</td>
                         <td>{category.questionCount}</td>
-                        {/* <td>{category.lastUpdated}</td> */}
+                        <td>{category.lastUpdated}</td>
                         <td>
                            <button
                               onClick={() =>

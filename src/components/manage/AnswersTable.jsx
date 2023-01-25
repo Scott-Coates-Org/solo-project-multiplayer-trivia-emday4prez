@@ -1,7 +1,7 @@
 import Modal from "react-modal";
 import { useState, useEffect } from "react";
 import { collection, getDocs, doc, deleteDoc } from "firebase/firestore";
-import { useCollection } from "../../hooks/useCollection";
+
 import { db } from "../../firebase/client";
 
 const customStyles = {
@@ -14,11 +14,10 @@ const customStyles = {
       transform: "translate(-50%, -50%)",
    },
 };
-function AnswersTable() {
-   //const { documents: answers } = useCollection("answers");
-   console.log("rendered answers");
+function AnswersTable({ answers, selectedQuestionId }) {
+   console.log("rendered answers", answers);
    const [modalIsOpen, setIsOpen] = useState(false);
-   const [answersData, setAnswersData] = useState([]);
+
    const [Id, setId] = useState("");
 
    // const fetchPost = async () => {
@@ -65,9 +64,11 @@ function AnswersTable() {
                </tr>
             </thead>
             <tbody>
-               {answersData &&
-                  answersData
-                     //.filter((answer) => answer.questionId === selectedQuestion)
+               {answers &&
+                  answers
+                     .filter(
+                        (answer) => answer.questionId === selectedQuestionId
+                     )
                      .map((answer) => (
                         <tr key={answer.answerId}>
                            <td>{answer.answerContent}</td>
