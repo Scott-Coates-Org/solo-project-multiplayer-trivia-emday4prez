@@ -1,14 +1,13 @@
-import { useState, useEffect } from "react";
+import { useState, useRef } from "react";
 import Modal from "react-modal";
 import {
+   query,
+   doc,
+   where,
+   deleteDoc,
    collection,
    getDocs,
-   doc,
    setDoc,
-   Timestamp,
-   deleteDoc,
-   query,
-   where,
 } from "firebase/firestore";
 import { db } from "../../firebase/client";
 import "./CategoryTable.module.css";
@@ -30,9 +29,11 @@ function CategoryTable({
    setSelectedCategoryId,
 }) {
    console.log("render categories", categories);
+
    const [modalIsOpen, setIsOpen] = useState(false);
    const [categoryDocId, setCategoryDocId] = useState("");
-
+   const [categoryToAdd, setCategoryToAdd] = useState("");
+   const inputRef = useRef();
    //const questionsRef = collection(db, "questions");
    //const answersRef = collection(db, "answers");
    //const categoriesRef = collection(db, "categories");
@@ -62,7 +63,7 @@ function CategoryTable({
 
    //    return;
    // }
-   function openModal(categoryId, categoryDocId) {
+   function openModal(categoryId, categoryDocId, selectedQuestionId) {
       setIsOpen(true);
       setSelectedCategoryId(categoryId);
       setCategoryDocId(categoryDocId);
@@ -73,7 +74,27 @@ function CategoryTable({
    }
 
    async function onDelete(e) {
+      const questionIds = new Set([]);
       e.preventDefault();
+      const q = query(
+         collection(db, "questions"),
+         where("categoryId", "==", selectedCategoryId)
+      );
+      const querySnapshot = await getDocs(q);
+      querySnapshot.docs.forEach(async (doc) => {
+         const data = doc.data();
+         questionIds.add(data.questionId);
+         await deleteDoc(doc.ref);
+      });
+      const answersQuery = query(
+         collection(db, "answers"),
+         where("questionId", "in", Array.from(questionIds))
+      );
+      const answersQuerySnapshot = await getDocs(answersQuery);
+      answersQuerySnapshot.docs.forEach(async (doc) => {
+         await deleteDoc(doc.ref);
+      });
+
       await deleteDoc(doc(db, "categories", categoryDocId));
       closeModal();
       // const questionIds = new Set([]);
@@ -105,7 +126,21 @@ function CategoryTable({
       // }
    }
 
-   const addCategory = async () => {};
+   const addCategory = async () => {
+      if (inputRef.current.value.length < 3) {
+         alert("Category name must be at least 3 characters long");
+         return;
+      }
+      setCategoryToAdd(inputRef.current.value);
+
+      await setDoc(doc(db, "categories", categoryToAdd), {
+         categoryName: categoryToAdd,
+         questionCount: 0,
+         lastUpdated: new Date().toLocaleString(),
+         categoryId: Math.floor(Math.random() * 1000000000).toLocaleString(),
+      });
+      inputRef.current.value = "";
+   };
 
    Modal.setAppElement(document.getElementById("root"));
 
@@ -152,7 +187,7 @@ function CategoryTable({
                   ))}
                <tr>
                   <td>
-                     <input type="text"></input>
+                     <input type="text" ref={inputRef}></input>
                   </td>
                   <td>
                      <button onClick={addCategory}>add</button>
