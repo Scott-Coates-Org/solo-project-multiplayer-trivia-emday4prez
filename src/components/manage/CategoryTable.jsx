@@ -24,14 +24,14 @@ const customStyles = {
    },
 };
 
-function CategoryTable() {
-   console.log("render");
+function CategoryTable({
+   categories,
+   selectedCategoryId,
+   setSelectedCategoryId,
+}) {
+   console.log("render categories", categories);
    const [modalIsOpen, setIsOpen] = useState(false);
-   const [categories, setCategories] = useState([]);
-   const [selectedCategoryDocId, setSelectedCategoryDocId] = useState("");
-   const [selectedCategoryId, setSelectedCategoryId] = useState("");
-   const [questionIdsToDelete, setQuestionIdsToDelete] = useState([]);
-   const [addCategoryInput, setAddCategoryInput] = useState("");
+   const [categoryDocId, setCategoryDocId] = useState("");
 
    //const questionsRef = collection(db, "questions");
    //const answersRef = collection(db, "answers");
@@ -62,11 +62,10 @@ function CategoryTable() {
 
    //    return;
    // }
-   function openModal(docId, categoryId) {
+   function openModal(categoryId, categoryDocId) {
       setIsOpen(true);
-
-      setSelectedCategoryDocId(docId);
       setSelectedCategoryId(categoryId);
+      setCategoryDocId(categoryDocId);
    }
 
    function closeModal() {
@@ -75,6 +74,8 @@ function CategoryTable() {
 
    async function onDelete(e) {
       e.preventDefault();
+      await deleteDoc(doc(db, "categories", categoryDocId));
+      closeModal();
       // const questionIds = new Set([]);
       // const reference = doc(db, "categories", selectedCategoryDocId);
       // console.log(selectedCategoryId);
@@ -102,22 +103,9 @@ function CategoryTable() {
       // } catch (e) {
       //    console.log("error: ", e.message);
       // }
-
-      closeModal();
    }
 
-   const addCategory = async () => {
-      if (addCategoryInput.length < 3) {
-         alert("categories must be at least two letters");
-         return;
-      }
-      // await setDoc(doc(db, "categories", addCategoryInput), {
-      //    categoryName: addCategoryInput,
-      //    categoryId: `cat_${categories.length + 1}`,
-      //    lastUpdated: Timestamp.fromDate(new Date()),
-      // });
-      setAddCategoryInput("");
-   };
+   const addCategory = async () => {};
 
    Modal.setAppElement(document.getElementById("root"));
 
@@ -143,12 +131,18 @@ function CategoryTable() {
                         <td>{category.questionCount}</td>
                         {/* <td>{category.lastUpdated}</td> */}
                         <td>
-                           <button>select</button>
+                           <button
+                              onClick={() =>
+                                 setSelectedCategoryId(category.categoryId)
+                              }
+                           >
+                              select
+                           </button>
                         </td>
                         <td>
                            <button
                               onClick={() =>
-                                 openModal(category.id, category.categoryId)
+                                 openModal(category.categoryId, category.id)
                               }
                            >
                               delete
@@ -158,11 +152,7 @@ function CategoryTable() {
                   ))}
                <tr>
                   <td>
-                     <input
-                        type="text"
-                        value={addCategoryInput}
-                        onChange={(e) => setAddCategoryInput(e.target.value)}
-                     ></input>
+                     <input type="text"></input>
                   </td>
                   <td>
                      <button onClick={addCategory}>add</button>
@@ -181,7 +171,7 @@ function CategoryTable() {
             <div>are you sure you want to delete</div>
             <form>
                <button onClick={closeModal}>cancel</button>
-               {/* <button onClick={onDelete}>delete</button> */}
+               <button onClick={onDelete}>delete</button>
             </form>
          </Modal>
       </div>

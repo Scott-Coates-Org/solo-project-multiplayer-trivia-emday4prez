@@ -21,6 +21,7 @@ const customStyles = {
 };
 
 function QuestionsTable({ selectedQuestionId, setSelectedQuestionId }) {
+   console.log("render questions table");
    const [modalIsOpen, setIsOpen] = useState(false);
    const [questions, setQuestions] = useState([]);
 

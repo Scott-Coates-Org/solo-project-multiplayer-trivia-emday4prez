@@ -19,7 +19,5 @@ if (keysWithEmptyValues)
       `These keys must be filled in ROOT_DIR/env.local before starting the app: ${keysWithEmptyValues}`
    );
 
-const app = initializeApp(firebaseConfig);
-const db = getFirestore(app);
-
-export { app, db };
+export const app = initializeApp(firebaseConfig);
+export const db = getFirestore(app);
