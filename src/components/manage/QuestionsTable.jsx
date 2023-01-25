@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useRef } from "react";
 import Modal from "react-modal";
 import {
    collection,
@@ -7,6 +7,7 @@ import {
    deleteDoc,
    query,
    where,
+   addDoc,
 } from "firebase/firestore";
 import { db } from "../../firebase/client";
 const customStyles = {
@@ -26,25 +27,11 @@ function QuestionsTable({
    selectedQuestionId,
    setSelectedQuestionId,
 }) {
-   console.log("render questions table");
+   console.log("render questions table", questions);
    const [modalIsOpen, setIsOpen] = useState(false);
    const [questionDocId, setQuestionDocId] = useState("");
-   // const questionsRef = collection(db, "questions");
-   // const answersRef = collection(db, "answers");
-
-   // const fetchPost = async () => {
-   //    await getDocs(questionsRef).then((querySnapshot) => {
-   //       const newData = querySnapshot.docs.map((doc) => ({
-   //          ...doc.data(),
-   //          id: doc.id,
-   //       }));
-   //       setQuestions(newData);
-   //    });
-   // };
-
-   // useEffect(() => {
-   //    fetchPost();
-   // }, [questionsRef]);
+   const [questionToAdd, setQuestionToAdd] = useState("");
+   const inputRef = useRef();
 
    function openModal(question) {
       setIsOpen(true);
@@ -73,11 +60,34 @@ function QuestionsTable({
       await deleteDoc(doc(db, "questions", questionDocId));
       closeModal();
    }
+
+   async function addQuestion() {
+      setQuestionToAdd(inputRef.current.value);
+      if (!selectedCategoryId) {
+         alert("please select a category first");
+         return;
+      }
+      if (inputRef.current.value.length < 11) {
+         alert("Questions must be at least 10 characters long");
+         return;
+      }
+      console.log(inputRef.current.value);
+
+      await addDoc(collection(db, "questions"), {
+         questionContent: questionToAdd,
+         categoryId: selectedCategoryId,
+         questionId: `quest_${Math.floor(
+            Math.random() * 1000000000
+         ).toString()}`,
+      });
+      inputRef.current.value = "";
+   }
+
    Modal.setAppElement(document.getElementById("root"));
 
    return (
       <div>
-         <h1>movie questions</h1>
+         <h1> questions</h1>
          <table>
             <thead>
                <tr>
@@ -110,6 +120,14 @@ function QuestionsTable({
                            </td>
                         </tr>
                      ))}
+               <tr>
+                  <td>
+                     <input type="text" ref={inputRef}></input>
+                  </td>
+                  <td>
+                     <button onClick={addQuestion}>add</button>
+                  </td>
+               </tr>
             </tbody>
          </table>
          <Modal

@@ -100,18 +100,24 @@ function CategoryTable({
    }
 
    const addCategory = async () => {
+      setCategoryToAdd(inputRef.current.value);
       if (inputRef.current.value.length < 3) {
          alert("Category name must be at least 3 characters long");
          return;
       }
-      setCategoryToAdd(inputRef.current.value);
 
-      await setDoc(doc(db, "categories", categoryToAdd), {
-         categoryName: categoryToAdd,
+      const docData = {
+         categoryName: inputRef.current.value,
          questionCount: 0,
          lastUpdated: new Date().toLocaleString(),
-         categoryId: Math.floor(Math.random() * 1000000000).toString(),
-      });
+         categoryId: Math.floor(Math.random() * 1000000).toString(),
+      };
+      try {
+         await setDoc(doc(db, "categories", inputRef.current.value), docData);
+      } catch (e) {
+         console.error(e);
+      }
+
       inputRef.current.value = "";
    };
 
