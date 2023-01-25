@@ -71,18 +71,6 @@ function QuestionsTable({
       });
 
       await deleteDoc(doc(db, "questions", questionDocId));
-      // const reference = doc(db, "questions", selectedQuestionId);
-      // await deleteDoc(reference);
-      // const q = query(
-      //    answersRef,
-      //    where("questionId", "==", `quest_${selectedQuestionId}`)
-      // );
-      // await getDocs(q).then((querySnapshot) => {
-      //    querySnapshot.docs.forEach((doc) => {
-      //       deleteDoc(doc.ref);
-      //    });
-      // });
-
       closeModal();
    }
    Modal.setAppElement(document.getElementById("root"));

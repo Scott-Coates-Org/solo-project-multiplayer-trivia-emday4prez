@@ -14,11 +14,14 @@ const customStyles = {
       transform: "translate(-50%, -50%)",
    },
 };
-function AnswersTable({ answers, selectedQuestionId }) {
+function AnswersTable({
+   answers,
+   selectedQuestionId,
+   selectedAnswerDocId,
+   setSelectedAnswerDocId,
+}) {
    console.log("rendered answers", answers);
    const [modalIsOpen, setIsOpen] = useState(false);
-
-   const [Id, setId] = useState("");
 
    // const fetchPost = async () => {
    //    await getDocs(collection(db, "answers")).then((querySnapshot) => {
@@ -34,9 +37,9 @@ function AnswersTable({ answers, selectedQuestionId }) {
    //    fetchPost();
    // }, [answers]);
 
-   function openModal(id) {
+   function openModal(answer) {
       setIsOpen(true);
-      setId(id);
+      setSelectedAnswerDocId(answer.id);
    }
 
    function closeModal() {
@@ -45,7 +48,7 @@ function AnswersTable({ answers, selectedQuestionId }) {
 
    async function onDelete(e) {
       e.preventDefault();
-      const reference = doc(db, "answers", Id);
+      const reference = doc(db, "answers", selectedAnswerDocId);
       await deleteDoc(reference);
 
       closeModal();
@@ -84,7 +87,7 @@ function AnswersTable({ answers, selectedQuestionId }) {
                            </td>
                            <td>
                               <div>
-                                 <button onClick={() => openModal(answer.id)}>
+                                 <button onClick={() => openModal(answer)}>
                                     delete
                                  </button>
                               </div>
