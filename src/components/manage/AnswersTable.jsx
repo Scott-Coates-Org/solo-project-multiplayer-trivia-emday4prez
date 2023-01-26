@@ -2,7 +2,9 @@ import Modal from "react-modal";
 import { useState, useRef } from "react";
 import {
    collection,
-   getDocs,
+   getDoc,
+   where,
+   updateDoc,
    doc,
    deleteDoc,
    addDoc,
@@ -47,6 +49,32 @@ function AnswersTable({
       closeModal();
    }
 
+   async function onMarkCorrect(id) {
+      setSelectedAnswerDocId(id);
+      const docRef = doc(db, "answers", id);
+      const docSnap = await getDoc(docRef);
+      console.log("docSnap", docSnap.data());
+
+      if (docSnap.exists()) {
+         if (docSnap.data().correct) {
+            await updateDoc(docRef, {
+               correct: false,
+            });
+            return;
+         }
+
+         await updateDoc(docRef, {
+            correct: true,
+         });
+      } else {
+         // doc.data() will be undefined in this case
+      }
+      const reference = doc(db, "answers", selectedAnswerDocId);
+
+      await updateDoc(reference, {
+         correct: true,
+      });
+   }
    async function addAnswer() {
       if (!selectedQuestionId) {
          alert("please select a question first");
@@ -87,14 +115,16 @@ function AnswersTable({
                         <tr key={answer.answerId}>
                            <td>{answer.answerContent}</td>
                            <td>
-                              {answer.correct ? (
+                              {answer.correct === true ? (
                                  <input type="radio" checked readOnly />
                               ) : (
                                  <input type="radio" readOnly />
                               )}
                            </td>
                            <td>
-                              <button>correct</button>
+                              <button onClick={() => onMarkCorrect(answer.id)}>
+                                 correct
+                              </button>
                            </td>
                            <td>
                               <div>
