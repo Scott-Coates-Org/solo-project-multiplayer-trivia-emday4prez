@@ -2,6 +2,8 @@ import Modal from "react-modal";
 import { useState, useRef } from "react";
 import {
    collection,
+   query,
+   getDocs,
    getDoc,
    where,
    updateDoc,
@@ -50,6 +52,25 @@ function AnswersTable({
    }
 
    async function onMarkCorrect(id) {
+      // setSelectedAnswerDocId(id);
+      // const q = query(
+      //    collection(db, "answers"),
+      //    where("questionId", "==", selectedQuestionId)
+      // );
+      // const querySnapshot = await getDocs(q);
+      // querySnapshot.forEach(async (doc) => {
+
+      //    if (doc.data().correct === true) {
+      //       console.log(doc.ref.path);
+      //       await updateDoc(doc.ref.path, {
+      //          correct: false,
+      //       });
+      //    } else {
+      //       await updateDoc(doc.ref.path, {
+      //          correct: false,
+      //       });
+      //    }
+      // });
       setSelectedAnswerDocId(id);
       const docRef = doc(db, "answers", id);
       const docSnap = await getDoc(docRef);
