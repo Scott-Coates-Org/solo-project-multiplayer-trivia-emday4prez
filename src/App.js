@@ -1,6 +1,6 @@
 import DbTest from "./components/db-test";
 import * as React from "react";
-import { Routes, Route, Outlet, Link } from "react-router-dom";
+import { Routes, Route, Link } from "react-router-dom";
 import Manage from "./components/manage/ManagePage";
 import Home from "./components/home/HomePage";
 import Layout from "./components/Layout";
