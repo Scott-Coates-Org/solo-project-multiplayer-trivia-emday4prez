@@ -4,7 +4,8 @@ import { Routes, Route, Outlet, Link } from "react-router-dom";
 import Manage from "./components/manage/ManagePage";
 import Home from "./components/home/HomePage";
 import Layout from "./components/Layout";
-
+import Create from "./components/create/CreatePage";
+import Join from "./components/join/JoinPage";
 export default function App() {
    console.log("render app");
    return (
@@ -26,6 +27,8 @@ export default function App() {
             <Route path="/" element={<Layout />}>
                <Route index element={<Home />} />
                <Route path="manage" element={<Manage />} />
+               <Route path="create" element={<Create />} />
+               <Route path="join" element={<Join />} />
 
                {/* Using path="*"" means "match anything", so this route
             acts like a catch-all for URLs that we don't have explicit
