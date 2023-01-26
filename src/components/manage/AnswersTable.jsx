@@ -1,6 +1,16 @@
 import Modal from "react-modal";
-import { useState, useEffect } from "react";
-import { collection, getDocs, doc, deleteDoc } from "firebase/firestore";
+import { useState, useRef } from "react";
+import {
+   collection,
+   query,
+   getDocs,
+   getDoc,
+   where,
+   updateDoc,
+   doc,
+   deleteDoc,
+   addDoc,
+} from "firebase/firestore";
 
 import { db } from "../../firebase/client";
 
@@ -14,6 +24,7 @@ const customStyles = {
       transform: "translate(-50%, -50%)",
    },
 };
+
 function AnswersTable({
    answers,
    selectedQuestionId,
@@ -22,7 +33,7 @@ function AnswersTable({
 }) {
    console.log("rendered answers", answers);
    const [modalIsOpen, setIsOpen] = useState(false);
-
+   const inputRef = useRef();
    function openModal(answer) {
       setIsOpen(true);
       setSelectedAnswerDocId(answer.id);
@@ -39,10 +50,66 @@ function AnswersTable({
 
       closeModal();
    }
+
+   async function onMarkCorrect(id) {
+      // setSelectedAnswerDocId(id);
+      // const q = query(
+      //    collection(db, "answers"),
+      //    where("questionId", "==", selectedQuestionId)
+      // );
+      // const querySnapshot = await getDocs(q);
+      // querySnapshot.forEach(async (doc) => {
+
+      //    if (doc.data().correct === true) {
+      //       console.log(doc.ref.path);
+      //       await updateDoc(doc.ref.path, {
+      //          correct: false,
+      //       });
+      //    } else {
+      //       await updateDoc(doc.ref.path, {
+      //          correct: false,
+      //       });
+      //    }
+      // });
+      setSelectedAnswerDocId(id);
+      const docRef = doc(db, "answers", id);
+      const docSnap = await getDoc(docRef);
+
+      if (docSnap.data().correct === true) {
+         await updateDoc(docRef, {
+            correct: false,
+         });
+         return;
+      } else {
+         await updateDoc(docRef, {
+            correct: true,
+         });
+         return;
+      }
+   }
+   async function addAnswer() {
+      if (!selectedQuestionId) {
+         alert("please select a question first");
+         return;
+      }
+      if (inputRef.current.value.length < 2) {
+         alert("Answers must be at least 1 characters long");
+         return;
+      }
+
+      await addDoc(collection(db, "answers"), {
+         answerContent: inputRef.current.value,
+         questionId: selectedQuestionId,
+         answerId: `ans_${Math.floor(Math.random() * 100000).toString()}`,
+      });
+      inputRef.current.value = "";
+   }
    Modal.setAppElement(document.getElementById("root"));
    return (
       <div>
-         <h1> movie answers</h1>
+         <h1> answers</h1>
+         <p>only questions with 2 or more answers will be used in game.</p>
+         <p>each question can have only one correct answer</p>
          <table>
             <thead>
                <tr>
@@ -62,14 +129,16 @@ function AnswersTable({
                         <tr key={answer.answerId}>
                            <td>{answer.answerContent}</td>
                            <td>
-                              {answer.correct ? (
+                              {answer.correct === true ? (
                                  <input type="radio" checked readOnly />
                               ) : (
                                  <input type="radio" readOnly />
                               )}
                            </td>
                            <td>
-                              <button>correct</button>
+                              <button onClick={() => onMarkCorrect(answer.id)}>
+                                 correct
+                              </button>
                            </td>
                            <td>
                               <div>
@@ -80,6 +149,14 @@ function AnswersTable({
                            </td>
                         </tr>
                      ))}
+               <tr>
+                  <td>
+                     <input type="text" ref={inputRef}></input>
+                  </td>
+                  <td>
+                     <button onClick={addAnswer}>add</button>
+                  </td>
+               </tr>
             </tbody>
          </table>
          <Modal
