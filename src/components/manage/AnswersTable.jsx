@@ -87,6 +87,8 @@ function AnswersTable({
    return (
       <div>
          <h1> answers</h1>
+         <p>only questions with 2 or more answers will be used in game.</p>
+         <p>each question can have only one correct answer</p>
          <table>
             <thead>
                <tr>
