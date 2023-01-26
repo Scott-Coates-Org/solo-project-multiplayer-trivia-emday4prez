@@ -53,27 +53,18 @@ function AnswersTable({
       setSelectedAnswerDocId(id);
       const docRef = doc(db, "answers", id);
       const docSnap = await getDoc(docRef);
-      console.log("docSnap", docSnap.data());
 
-      if (docSnap.exists()) {
-         if (docSnap.data().correct) {
-            await updateDoc(docRef, {
-               correct: false,
-            });
-            return;
-         }
-
+      if (docSnap.data().correct === true) {
+         await updateDoc(docRef, {
+            correct: false,
+         });
+         return;
+      } else {
          await updateDoc(docRef, {
             correct: true,
          });
-      } else {
-         // doc.data() will be undefined in this case
+         return;
       }
-      const reference = doc(db, "answers", selectedAnswerDocId);
-
-      await updateDoc(reference, {
-         correct: true,
-      });
    }
    async function addAnswer() {
       if (!selectedQuestionId) {
