@@ -1,6 +1,12 @@
 import Modal from "react-modal";
-import { useState, useEffect } from "react";
-import { collection, getDocs, doc, deleteDoc } from "firebase/firestore";
+import { useState, useRef } from "react";
+import {
+   collection,
+   getDocs,
+   doc,
+   deleteDoc,
+   addDoc,
+} from "firebase/firestore";
 
 import { db } from "../../firebase/client";
 
@@ -14,6 +20,7 @@ const customStyles = {
       transform: "translate(-50%, -50%)",
    },
 };
+
 function AnswersTable({
    answers,
    selectedQuestionId,
@@ -22,7 +29,7 @@ function AnswersTable({
 }) {
    console.log("rendered answers", answers);
    const [modalIsOpen, setIsOpen] = useState(false);
-
+   const inputRef = useRef();
    function openModal(answer) {
       setIsOpen(true);
       setSelectedAnswerDocId(answer.id);
@@ -39,10 +46,28 @@ function AnswersTable({
 
       closeModal();
    }
+
+   async function addAnswer() {
+      if (!selectedQuestionId) {
+         alert("please select a question first");
+         return;
+      }
+      if (inputRef.current.value.length < 2) {
+         alert("Answers must be at least 1 characters long");
+         return;
+      }
+
+      await addDoc(collection(db, "answers"), {
+         answerContent: inputRef.current.value,
+         questionId: selectedQuestionId,
+         answerId: `ans_${Math.floor(Math.random() * 100000).toString()}`,
+      });
+      inputRef.current.value = "";
+   }
    Modal.setAppElement(document.getElementById("root"));
    return (
       <div>
-         <h1> movie answers</h1>
+         <h1> answers</h1>
          <table>
             <thead>
                <tr>
@@ -80,6 +105,14 @@ function AnswersTable({
                            </td>
                         </tr>
                      ))}
+               <tr>
+                  <td>
+                     <input type="text" ref={inputRef}></input>
+                  </td>
+                  <td>
+                     <button onClick={addAnswer}>add</button>
+                  </td>
+               </tr>
             </tbody>
          </table>
          <Modal
