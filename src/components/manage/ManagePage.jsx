@@ -40,6 +40,7 @@ function Manage() {
                selectedQuestionId={selectedQuestionId}
                selectedAnswerDocId={selectedAnswerDocId}
                setSelectedAnswerDocId={setSelectedAnswerDocId}
+               selectedCategoryId={selectedCategoryId}
             />
          )}
       </div>

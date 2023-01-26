@@ -5,6 +5,7 @@ export default function Lobby({ lobbyOptions }) {
       <div className={styles.lobby}>
          <h1>start game</h1>
          <p>choose a game category</p>
+         <div className={styles.categorySelect}></div>
       </div>
    );
 }

@@ -30,6 +30,7 @@ function AnswersTable({
    selectedQuestionId,
    selectedAnswerDocId,
    setSelectedAnswerDocId,
+   selectedCategoryId,
 }) {
    console.log("rendered answers", answers);
    const [modalIsOpen, setIsOpen] = useState(false);
@@ -101,6 +102,30 @@ function AnswersTable({
          questionId: selectedQuestionId,
          answerId: `ans_${Math.floor(Math.random() * 100000).toString()}`,
       });
+
+      const answerQuery = query(
+         collection(db, "answers"),
+         where("questionId", "==", selectedQuestionId)
+      );
+      const answerQuerySnapshot = await getDocs(answerQuery);
+
+      const answerCount = answerQuerySnapshot.docs.length;
+      console.log(answerCount);
+
+      if (answerCount > 1) {
+         const categoryRef = collection(db, "categories");
+         const categoryQuery = query(
+            categoryRef,
+            where("categoryId", "==", selectedCategoryId)
+         );
+         const categoryQuerySnapshot = await getDocs(categoryQuery);
+         const categoryDocRef = categoryQuerySnapshot.docs[0].ref;
+         await updateDoc(categoryDocRef, {
+            questionCount:
+               categoryQuerySnapshot.docs[0].data().questionCount + 1,
+         });
+      }
+
       inputRef.current.value = "";
    }
    Modal.setAppElement(document.getElementById("root"));
