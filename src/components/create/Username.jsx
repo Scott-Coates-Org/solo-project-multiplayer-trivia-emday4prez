@@ -1,13 +1,13 @@
 import { useRef } from "react";
 import styles from "./create.module.css";
-export default function Username() {
+export default function Username({ username, setUsername }) {
    const inputRef = useRef();
    const onContinue = () => {
       if (inputRef.current.value.length < 2) {
          alert("username must be at least 2 characters long");
          return;
       }
-      console.log(inputRef.current.value);
+      setUsername(inputRef.current.value);
    };
 
    return (

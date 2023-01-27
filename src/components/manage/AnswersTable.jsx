@@ -110,9 +110,14 @@ function AnswersTable({
       const answerQuerySnapshot = await getDocs(answerQuery);
 
       const answerCount = answerQuerySnapshot.docs.length;
-      console.log(answerCount);
 
-      if (answerCount > 1) {
+      let hasCorrectAnswer = false;
+      answerQuerySnapshot.docs.forEach((doc) => {
+         if (doc.data().correct === true) {
+            hasCorrectAnswer = true;
+         }
+      });
+      if (answerCount > 1 && hasCorrectAnswer === true) {
          const categoryRef = collection(db, "categories");
          const categoryQuery = query(
             categoryRef,
