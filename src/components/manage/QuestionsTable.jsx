@@ -8,6 +8,7 @@ import {
    query,
    where,
    addDoc,
+   updateDoc,
 } from "firebase/firestore";
 import { db } from "../../firebase/client";
 const customStyles = {
@@ -76,6 +77,7 @@ function QuestionsTable({
          categoryId: selectedCategoryId,
          questionId: `quest_${Math.floor(Math.random() * 10000000).toString()}`,
       });
+
       inputRef.current.value = "";
    }
 
