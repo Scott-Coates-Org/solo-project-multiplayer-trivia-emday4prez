@@ -16,8 +16,14 @@ function makeid(length) {
    return result;
 }
 
-export default function Username({ username, setUsername, categories }) {
+export default function Username({
+   username,
+   setUsername,
+   categories,
+   setGameDocId,
+}) {
    const inputRef = useRef();
+
    const onContinue = async () => {
       if (inputRef.current.value.length < 2) {
          alert("username must be at least 2 characters long");
@@ -32,6 +38,7 @@ export default function Username({ username, setUsername, categories }) {
          creator: inputRef.current.value,
          dateCreated: new Date().toLocaleDateString(),
       });
+      setGameDocId(gameRef.id);
    };
 
    return (

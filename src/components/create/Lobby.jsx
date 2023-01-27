@@ -1,27 +1,42 @@
+import { useRef, useState } from "react";
 import styles from "./create.module.css";
-import { collection, query, where } from "firebase/firestore";
+import { updateDoc, doc } from "firebase/firestore";
 import { db } from "../../firebase/client";
 import { useCollection } from "../../hooks/useCollection";
 
-export default function Lobby({ username, lobbyOptions = {} }) {
-   const { documents: categories } = useCollection("categories");
+export default function Lobby({
+   username,
+   lobbyOptions,
+   categories,
+   gameDocId,
+}) {
    console.log("render lobby");
+
+   const selectRef = useRef();
+
+   const onCategoryChange = async (e) => {
+      console.log(selectRef.current.value);
+      const gameRef = doc(db, "games", gameDocId);
+      await updateDoc(gameRef, {
+         category: selectRef.current.value,
+      });
+   };
+
    return (
       <div className={styles.lobby}>
          <h1>start game</h1>
          <p>choose a game category</p>
          <div className={styles.categorySelect}>
-            {categories &&
-               categories
-                  .filter((category) => category.questionCount > 0)
-                  .map((category) => (
-                     <button
-                        key={category.id}
-                        onClick={() => lobbyOptions.setCategoryId(category.id)}
-                     >
-                        {category.categoryName}
-                     </button>
-                  ))}
+            <select name="category" ref={selectRef} onChange={onCategoryChange}>
+               {categories &&
+                  categories
+                     .filter((category) => category.questionCount > 0)
+                     .map((category) => (
+                        <option key={category.id} value={category.id}>
+                           {category.categoryName}
+                        </option>
+                     ))}
+            </select>
          </div>
          <div>
             <h3>list of users</h3>
