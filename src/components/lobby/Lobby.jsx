@@ -1,8 +1,7 @@
-import { useRef, useState } from "react";
-import styles from "./create.module.css";
+import { useRef } from "react";
+import styles from "../../components/create/create.module.css";
 import { updateDoc, doc } from "firebase/firestore";
 import { db } from "../../firebase/client";
-import { useCollection } from "../../hooks/useCollection";
 
 export default function Lobby({
    username,
@@ -14,8 +13,7 @@ export default function Lobby({
 
    const selectRef = useRef();
 
-   const onCategoryChange = async (e) => {
-      console.log(selectRef.current.value);
+   const onCategoryChange = async () => {
       const gameRef = doc(db, "games", gameDocId);
       await updateDoc(gameRef, {
          category: selectRef.current.value,

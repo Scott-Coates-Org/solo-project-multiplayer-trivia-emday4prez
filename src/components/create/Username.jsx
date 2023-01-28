@@ -2,6 +2,7 @@ import { useRef } from "react";
 import styles from "./create.module.css";
 import { collection, addDoc } from "firebase/firestore";
 import { db } from "../../firebase/client";
+import { useNavigate } from "react-router-dom";
 
 function makeid(length) {
    let result = "";
@@ -23,7 +24,7 @@ export default function Username({
    setGameDocId,
 }) {
    const inputRef = useRef();
-
+   const navigate = useNavigate();
    const onContinue = async () => {
       if (inputRef.current.value.length < 2) {
          alert("username must be at least 2 characters long");
@@ -39,6 +40,7 @@ export default function Username({
          dateCreated: new Date().toLocaleDateString(),
       });
       setGameDocId(gameRef.id);
+      navigate("/lobby");
    };
 
    return (
