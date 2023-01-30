@@ -1,14 +1,23 @@
 import React, { useRef } from "react";
 import { useNavigate } from "react-router-dom";
-
+import { getDocs, collection } from "firebase/firestore";
+import { db } from "../../firebase/client";
 function Join() {
    const navigate = useNavigate();
    const roomCodeRef = useRef();
 
-   const handleClick = () => {
+   const handleClick = async () => {
       const roomCode = roomCodeRef.current.value;
-      if (roomCode.length < 4) {
-         alert("room code must be at least 4 characters long");
+
+      if (roomCode.length !== 4) {
+         alert("room code must be 4 characters long");
+         return;
+      }
+      const gamesCollection = collection(db, "games");
+      const query = gamesCollection.where("roomCode", "==", roomCode);
+      const querySnapshot = await getDocs(query);
+      if (querySnapshot.empty) {
+         alert("room code does not exist");
          return;
       }
 
