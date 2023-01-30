@@ -3,12 +3,7 @@ import styles from "../../components/create/create.module.css";
 import { updateDoc, doc } from "firebase/firestore";
 import { db } from "../../firebase/client";
 
-export default function Lobby({
-   username,
-   lobbyOptions,
-   categories,
-   gameDocId,
-}) {
+export default function Lobby({ lobbyOptions, categories, gameDocId }) {
    console.log("render lobby");
 
    const selectRef = useRef();
@@ -39,7 +34,7 @@ export default function Lobby({
          <div>
             <h3>list of users</h3>
             <div className={styles.userList}>
-               <p>{username} (you)</p>
+               <p>(you)</p>
             </div>
          </div>
          <div className={styles.startButton}>

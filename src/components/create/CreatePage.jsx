@@ -2,20 +2,19 @@ import React from "react";
 import Username from "./Username";
 
 import styles from "./create.module.css";
-import { useCollection } from "../../hooks/useCollection";
 
 function CreatePage({ categories }) {
-   const [username, setUsername] = React.useState("");
+   const [creatorName, setCreatorName] = React.useState("");
    const [gameDocId, setGameDocId] = React.useState("");
    return (
       <div className={styles.createPage}>
          <h2>create a new game</h2>
 
          {
-            !username && (
+            !creatorName && (
                <Username
-                  username={username}
-                  setUsername={setUsername}
+                  creatorName={creatorName}
+                  setCreatorName={setCreatorName}
                   categories={categories}
                   setGameDocId={setGameDocId}
                />

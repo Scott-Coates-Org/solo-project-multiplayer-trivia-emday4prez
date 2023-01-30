@@ -18,8 +18,8 @@ function makeid(length) {
 }
 
 export default function Username({
-   username,
-   setUsername,
+   creatorName,
+   setCreatorName,
    categories,
    setGameDocId,
 }) {
@@ -30,7 +30,7 @@ export default function Username({
          alert("username must be at least 2 characters long");
          return;
       }
-      setUsername(inputRef.current.value);
+      setCreatorName(inputRef.current.value);
 
       const gameRef = await addDoc(collection(db, "games"), {
          roomCode: makeid(4),
