@@ -4,13 +4,13 @@ import QuestionsTable from "./QuestionsTable";
 import AnswersTable from "./AnswersTable";
 import { useCollection } from "../../hooks/useCollection";
 
-function Manage() {
+function Manage({ categories }) {
    console.log("manage page");
 
    const [selectedQuestionId, setSelectedQuestionId] = useState("");
    const [selectedCategoryId, setSelectedCategoryId] = useState("");
    const [selectedAnswerDocId, setSelectedAnswerDocId] = useState("");
-   const { documents: categories } = useCollection("categories");
+
    const { documents: questions } = useCollection("questions");
    const { documents: answers } = useCollection("answers");
    return (

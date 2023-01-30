@@ -1,13 +1,16 @@
-import DbTest from "./components/db-test";
-import * as React from "react";
 import { Routes, Route, Link } from "react-router-dom";
+import { useCollection } from "./hooks/useCollection";
 import Manage from "./components/manage/ManagePage";
 import Home from "./components/home/HomePage";
 import Layout from "./components/Layout";
 import Create from "./components/create/CreatePage";
 import Join from "./components/join/JoinPage";
+import Lobby from "./components/lobby/Lobby";
+
 export default function App() {
+   const { documents: categories } = useCollection("categories");
    console.log("render app");
+
    return (
       <div>
          <h1>Trivia</h1>
@@ -26,9 +29,19 @@ export default function App() {
          <Routes>
             <Route path="/" element={<Layout />}>
                <Route index element={<Home />} />
-               <Route path="manage" element={<Manage />} />
-               <Route path="create" element={<Create />} />
+               <Route
+                  path="manage"
+                  element={<Manage categories={categories} />}
+               />
+               <Route
+                  path="create"
+                  element={<Create categories={categories} />}
+               />
                <Route path="join" element={<Join />} />
+               <Route
+                  path="lobby"
+                  element={<Lobby categories={categories} />}
+               />
 
                {/* Using path="*"" means "match anything", so this route
             acts like a catch-all for URLs that we don't have explicit

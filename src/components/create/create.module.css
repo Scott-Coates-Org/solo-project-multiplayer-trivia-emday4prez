@@ -19,3 +19,10 @@
 .space {
  margin: 6px;
 }
+
+.lobby {
+   display: flex;
+   flex-direction: column;
+   justify-content: center;
+   align-items: center;
+}
