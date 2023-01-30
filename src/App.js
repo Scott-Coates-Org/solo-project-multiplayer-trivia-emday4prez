@@ -1,4 +1,3 @@
-import React, { useState } from "react";
 import { Routes, Route, Link } from "react-router-dom";
 import { useCollection } from "./hooks/useCollection";
 import Manage from "./components/manage/ManagePage";
@@ -7,6 +6,7 @@ import Layout from "./components/Layout";
 import Create from "./components/create/CreatePage";
 import Join from "./components/join/JoinPage";
 import Lobby from "./components/lobby/Lobby";
+
 export default function App() {
    const { documents: categories } = useCollection("categories");
    console.log("render app");

@@ -2,7 +2,8 @@ import React, { useRef } from "react";
 import { useNavigate } from "react-router-dom";
 import { getDocs, collection } from "firebase/firestore";
 import { db } from "../../firebase/client";
-function Join() {
+
+function Join({ username }) {
    const navigate = useNavigate();
    const roomCodeRef = useRef();
 
@@ -20,6 +21,9 @@ function Join() {
          alert("room code does not exist");
          return;
       }
+      querySnapshot.docs[0].ref.update({
+         usernames: [...querySnapshot.docs[0].data().usernames, username],
+      });
 
       navigate("/lobby");
    };
