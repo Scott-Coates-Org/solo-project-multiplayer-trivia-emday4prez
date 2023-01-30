@@ -1,12 +1,7 @@
 import styles from "./join.module.css";
 import { useRef } from "react";
 
-export default function Username({
-   username,
-   setUsername,
-   categories,
-   setGameDocId,
-}) {
+export default function Username() {
    const inputRef = useRef();
 
    const onContinue = async () => {
@@ -14,7 +9,6 @@ export default function Username({
          alert("username must be at least 2 characters long");
          return;
       }
-      setUsername(inputRef.current.value);
    };
 
    return (
