@@ -12,7 +12,7 @@ import { db } from "../../firebase/client";
 import { useLoaderData, useParams, useLocation } from "react-router-dom";
 
 export default function Lobby({ lobbyOptions }) {
-   const { data: categories, gameDocId } = useLoaderData();
+   const { data: categories, gameDocId, users } = useLoaderData();
    console.log("render lobby -- game docID", gameDocId);
    const { roomCode } = useParams();
    let { state } = useLocation();
@@ -48,7 +48,16 @@ export default function Lobby({ lobbyOptions }) {
          </div>
          <div>
             <h3>list of users</h3>
-            <div className={styles.userList}>display list of users</div>
+            <div className={styles.userList}>
+               {users &&
+                  users.map((user) => {
+                     return (
+                        <div key={user} className={styles.user}>
+                           {user}
+                        </div>
+                     );
+                  })}
+            </div>
          </div>
          <div>
             <h2>room code</h2>
