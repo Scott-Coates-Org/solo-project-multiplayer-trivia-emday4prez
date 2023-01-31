@@ -1,9 +1,8 @@
-import { useRef, useState } from "react";
+import { useRef } from "react";
 import styles from "./create.module.css";
 import { collection, addDoc } from "firebase/firestore";
 import { db } from "../../firebase/client";
-import { useNavigate } from "react-router-dom";
-import { useCollection } from "../../hooks/useCollection";
+import { Link } from "react-router-dom";
 
 function makeId(length) {
    let result = "";
@@ -22,11 +21,11 @@ export default function Username({
    creatorName,
    setCreatorName,
    setGameDocId,
+   categories,
 }) {
-   const { documents: categories } = useCollection("categories");
-   const [code, setCode] = useState(makeId(4));
+   const code = makeId(4);
    const inputRef = useRef();
-   const navigate = useNavigate();
+
    const onContinue = async () => {
       if (inputRef.current.value.length < 2) {
          alert("username must be at least 2 characters long");
@@ -40,10 +39,11 @@ export default function Username({
          category: categories.filter((c) => c.questionCount > 0)[0].id,
          creator: inputRef.current.value,
          dateCreated: new Date().toLocaleDateString(),
-         active: true,
+         started: false,
+         inLobby: true,
       });
       setGameDocId(gameRef.id);
-      navigate(`/lobby/${code}`);
+      //navigate(`/create/${code}`);
    };
 
    return (
@@ -52,7 +52,9 @@ export default function Username({
          <input type="text" ref={inputRef} />
          <div className={styles.space}></div>
          <div className={styles.buttonContainer}>
-            <button onClick={onContinue}>continue</button>
+            <Link to={`/lobby/${code}`} state={{ host: true }}>
+               <button onClick={onContinue}>continue</button>
+            </Link>
          </div>
       </div>
    );
