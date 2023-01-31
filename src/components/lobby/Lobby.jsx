@@ -1,20 +1,14 @@
 import { useRef } from "react";
 import styles from "../../components/create/create.module.css";
-import {
-   updateDoc,
-   doc,
-   getDoc,
-   query,
-   collection,
-   where,
-} from "firebase/firestore";
+import { updateDoc, doc, getDocs, collection } from "firebase/firestore";
 import { db } from "../../firebase/client";
-import { useCollection } from "../../hooks/useCollection";
+import { useLoaderData, useParams } from "react-router-dom";
+
 export default function Lobby({ lobbyOptions, gameDocId }) {
    console.log("render lobby", gameDocId);
-   const { documents: categories } = useCollection("categories");
+   const { roomCode } = useParams();
    const selectRef = useRef();
-
+   const { data: categories } = useLoaderData();
    const onCategoryChange = async () => {
       const gameRef = doc(db, "games", gameDocId);
       await updateDoc(gameRef, {
@@ -42,9 +36,24 @@ export default function Lobby({ lobbyOptions, gameDocId }) {
             <h3>list of users</h3>
             <div className={styles.userList}>display list of users</div>
          </div>
+         <div>
+            <h2>room code</h2>
+            <div className={styles.roomCode}>{roomCode}</div>
+         </div>
          <div className={styles.startButton}>
             <button>start game</button>
          </div>
       </div>
    );
 }
+
+export const lobbyLoader = async ({ params }) => {
+   const categoryRef = collection(db, "categories");
+   const categorySnapshot = await getDocs(categoryRef);
+   const data = [];
+   categorySnapshot.docs.forEach((doc) => {
+      data.push(doc.data());
+   });
+
+   return { data };
+};

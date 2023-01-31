@@ -2,8 +2,7 @@ import { useRef, useState } from "react";
 import styles from "./create.module.css";
 import { collection, addDoc } from "firebase/firestore";
 import { db } from "../../firebase/client";
-import { useNavigate, Link } from "react-router-dom";
-import { useCollection } from "../../hooks/useCollection";
+import { Link } from "react-router-dom";
 
 function makeId(length) {
    let result = "";
@@ -22,11 +21,10 @@ export default function Username({
    creatorName,
    setCreatorName,
    setGameDocId,
+   categories,
 }) {
-   const { documents: categories } = useCollection("categories");
    const [code, setCode] = useState(makeId(4));
    const inputRef = useRef();
-   const navigate = useNavigate();
 
    const onContinue = async () => {
       if (inputRef.current.value.length < 2) {
