@@ -1,10 +1,11 @@
-import { useRef } from "react";
+import { useRef, useState } from "react";
 import styles from "./create.module.css";
 import { collection, addDoc } from "firebase/firestore";
 import { db } from "../../firebase/client";
 import { useNavigate } from "react-router-dom";
+import { useCollection } from "../../hooks/useCollection";
 
-function makeid(length) {
+function makeId(length) {
    let result = "";
    const characters =
       "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
@@ -20,9 +21,10 @@ function makeid(length) {
 export default function Username({
    creatorName,
    setCreatorName,
-   categories,
    setGameDocId,
 }) {
+   const { documents: categories } = useCollection("categories");
+   const [code, setCode] = useState(makeId(4));
    const inputRef = useRef();
    const navigate = useNavigate();
    const onContinue = async () => {
@@ -33,14 +35,15 @@ export default function Username({
       setCreatorName(inputRef.current.value);
 
       const gameRef = await addDoc(collection(db, "games"), {
-         roomCode: makeid(4),
+         roomCode: code,
          usernames: [inputRef.current.value],
          category: categories.filter((c) => c.questionCount > 0)[0].id,
          creator: inputRef.current.value,
          dateCreated: new Date().toLocaleDateString(),
+         active: true,
       });
       setGameDocId(gameRef.id);
-      navigate("/lobby");
+      navigate(`/lobby/${code}`);
    };
 
    return (
