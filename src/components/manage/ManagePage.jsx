@@ -10,9 +10,9 @@ function Manage() {
    const [selectedQuestionId, setSelectedQuestionId] = useState("");
    const [selectedCategoryId, setSelectedCategoryId] = useState("");
    const [selectedAnswerDocId, setSelectedAnswerDocId] = useState("");
-   const { documents: categories } = useCollection("categories");
-   const { documents: questions } = useCollection("questions");
-   const { documents: answers } = useCollection("answers");
+   // const { documents: categories } = useCollection("categories");
+   // const { documents: questions } = useCollection("questions");
+   // const { documents: answers } = useCollection("answers");
    return (
       <div>
          <h2>MGMT</h2>

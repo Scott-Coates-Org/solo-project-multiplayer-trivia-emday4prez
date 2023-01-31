@@ -14,7 +14,6 @@ import { db } from "../../firebase/client";
 import styles from "../../components/create/create.module.css";
 
 export default function Lobby({ lobbyOptions }) {
-   const [gameDocData, setGameDocData] = useState([]);
    const [selectedCategoryName, setSelectedCategoryName] = useState("");
    const { data: categories, gameDocId, users } = useLoaderData();
    console.log("render lobby -- game docID", gameDocId);
@@ -42,33 +41,19 @@ export default function Lobby({ lobbyOptions }) {
          category: selectRef.current.value,
       });
    };
-
+   console.log("state", state);
    return (
       <div className={styles.lobby}>
          {error && <strong>Error: {JSON.stringify(error)}</strong>}
          {loading && <span>Document: Loading...</span>}
-         <h1>start game</h1>
-         <p>choose a game category</p>
-         <div key="cat" className={styles.categorySelect}>
-            <select
-               name="category"
-               disabled={!state.host}
-               ref={selectRef}
-               onChange={onCategoryChange}
-            >
-               {categories &&
-                  categories
-                     .filter((category) => category.questionCount > 0)
-                     .map((category) => (
-                        <option key={category.id} value={category.id}>
-                           {category.categoryName}
-                        </option>
-                     ))}
-            </select>
-            {gameDoc && (
-               <h3>{`selected category: ${gameDoc.data().category}`}</h3>
-            )}
-         </div>
+         <h1>game lobby</h1>
+         {state.host && (
+            <SelectCategory
+               onCategoryChange={onCategoryChange}
+               selectRef={selectRef}
+               categories={categories}
+            />
+         )}
          <div>
             <h3>list of users</h3>
             <div className={styles.userList}>
@@ -83,12 +68,42 @@ export default function Lobby({ lobbyOptions }) {
             </div>
          </div>
          <div>
+            <h3>selected category</h3>
+            <div className={styles.selectedCategory}>
+               {gameDoc && gameDoc.data().category}
+            </div>
+         </div>
+         <div>
             <h2>room code</h2>
             <div className={styles.roomCode}>{roomCode}</div>
          </div>
          <div className={styles.startButton}>
-            <button disabled={!state.host}>start game</button>
+            <button disabled={!state.host || users.length < 2}>
+               start game
+            </button>
          </div>
+      </div>
+   );
+}
+
+function SelectCategory({ categories, selectRef, onCategoryChange }) {
+   console.log("select category", categories);
+   return (
+      <div>
+         <h3>select category</h3>
+         <select ref={selectRef} onChange={onCategoryChange}>
+            {categories &&
+               categories.map((category) => {
+                  return (
+                     <option
+                        key={category.categoryId}
+                        value={category.categoryName}
+                     >
+                        {category.categoryName}
+                     </option>
+                  );
+               })}
+         </select>
       </div>
    );
 }
