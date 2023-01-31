@@ -23,7 +23,7 @@ export default function Username({
    setGameDocId,
    categories,
 }) {
-   const [code, setCode] = useState(makeId(4));
+   const code = makeId(4);
    const inputRef = useRef();
 
    const onContinue = async () => {

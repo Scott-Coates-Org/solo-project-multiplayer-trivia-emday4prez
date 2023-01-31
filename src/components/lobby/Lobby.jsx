@@ -1,14 +1,22 @@
 import { useRef } from "react";
 import styles from "../../components/create/create.module.css";
-import { updateDoc, doc, getDocs, collection } from "firebase/firestore";
+import {
+   updateDoc,
+   doc,
+   getDocs,
+   collection,
+   query,
+   where,
+} from "firebase/firestore";
 import { db } from "../../firebase/client";
 import { useLoaderData, useParams } from "react-router-dom";
 
-export default function Lobby({ lobbyOptions, gameDocId }) {
-   console.log("render lobby", gameDocId);
+export default function Lobby({ lobbyOptions }) {
+   const { data: categories, gameDocId } = useLoaderData();
+   console.log("render lobby -- game docID", gameDocId);
    const { roomCode } = useParams();
    const selectRef = useRef();
-   const { data: categories } = useLoaderData();
+
    const onCategoryChange = async () => {
       const gameRef = doc(db, "games", gameDocId);
       await updateDoc(gameRef, {
@@ -48,12 +56,16 @@ export default function Lobby({ lobbyOptions, gameDocId }) {
 }
 
 export const lobbyLoader = async ({ params }) => {
+   const { roomCode } = params;
    const categoryRef = collection(db, "categories");
    const categorySnapshot = await getDocs(categoryRef);
    const data = [];
    categorySnapshot.docs.forEach((doc) => {
       data.push(doc.data());
    });
-
-   return { data };
+   const gamesRef = collection(db, "games");
+   const q = query(gamesRef, where("roomCode", "==", roomCode));
+   const gamesSnapshot = await getDocs(q);
+   const gameDocId = gamesSnapshot.docs[0].id;
+   return { data, gameDocId };
 };
