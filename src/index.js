@@ -17,18 +17,13 @@ const browserRouter = createBrowserRouter([
       children: [
          { path: "/", element: <Home /> },
          { path: "manage", element: <Manage /> },
-         {
-            path: "create",
-            element: <Create />,
-            children: [
-               {
-                  path: "/create/lobby/:roomCode",
-                  element: <Lobby />,
-                  loader: lobbyLoader,
-               },
-            ],
-         },
+         { path: "create", element: <Create /> },
          { path: "join", element: <Join /> },
+         {
+            path: "/lobby/:roomCode",
+            element: <Lobby />,
+            loader: lobbyLoader,
+         },
          { path: "*", element: <NoMatch /> },
       ],
    },

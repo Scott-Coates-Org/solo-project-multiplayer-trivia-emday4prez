@@ -52,7 +52,7 @@ export default function Username({
          <input type="text" ref={inputRef} />
          <div className={styles.space}></div>
          <div className={styles.buttonContainer}>
-            <Link to={`/create/lobby/${code}`} state={{ host: true }}>
+            <Link to={`/lobby/${code}`} state={{ host: true }}>
                <button onClick={onContinue}>continue</button>
             </Link>
          </div>
