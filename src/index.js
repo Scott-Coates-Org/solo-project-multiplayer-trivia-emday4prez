@@ -1,11 +1,6 @@
 import React from "react";
 import ReactDOM from "react-dom/client";
-import {
-   RouterProvider,
-   createBrowserRouter,
-   Route,
-   createRoutesFromElements,
-} from "react-router-dom";
+import { RouterProvider, createBrowserRouter } from "react-router-dom";
 import Manage from "./components/manage/ManagePage";
 import Home from "./components/home/HomePage";
 import Layout from "./components/Layout";

@@ -1,12 +1,11 @@
 import React, { useRef } from "react";
-import { useNavigate } from "react-router-dom";
+import { Link } from "react-router-dom";
 import { getDocs, collection } from "firebase/firestore";
 import { db } from "../../firebase/client";
-
+import { useState } from "react";
 function Join({ username }) {
-   const navigate = useNavigate();
    const roomCodeRef = useRef();
-
+   const [roomCode, setRoomCode] = useState("");
    const handleClick = async () => {
       const roomCode = roomCodeRef.current.value;
 
@@ -24,16 +23,16 @@ function Join({ username }) {
       querySnapshot.docs[0].ref.update({
          usernames: [...querySnapshot.docs[0].data().usernames, username],
       });
-
-      navigate("/lobby");
    };
    return (
       <div>
          <h1>enter room code here</h1>
          <p>enter the room code given to you by the game creator (host)</p>
          <h3>room code</h3>
-         <input type="text" ref={roomCodeRef} />
-         <button onClick={handleClick}>continue</button>
+         <input type="text" onBlur={(e) => setRoomCode(e.target.value)} />
+         <Link to={`/create/lobby/${roomCode}`} state={{ host: false }}>
+            <button onClick={handleClick}>continue</button>
+         </Link>
       </div>
    );
 }

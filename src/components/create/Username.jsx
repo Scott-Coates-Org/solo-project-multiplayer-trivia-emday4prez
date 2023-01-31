@@ -1,4 +1,4 @@
-import { useRef, useState } from "react";
+import { useRef } from "react";
 import styles from "./create.module.css";
 import { collection, addDoc } from "firebase/firestore";
 import { db } from "../../firebase/client";
@@ -52,7 +52,7 @@ export default function Username({
          <input type="text" ref={inputRef} />
          <div className={styles.space}></div>
          <div className={styles.buttonContainer}>
-            <Link to={`/create/lobby/${code}`}>
+            <Link to={`/create/lobby/${code}`} state={{ host: true }}>
                <button onClick={onContinue}>continue</button>
             </Link>
          </div>

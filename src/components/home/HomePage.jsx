@@ -1,6 +1,7 @@
 import styles from "./homepage.module.css";
 import { Link } from "react-router-dom";
 function Home() {
+   console.log("home");
    return (
       <div className={styles.homepage}>
          <h2>Home</h2>
