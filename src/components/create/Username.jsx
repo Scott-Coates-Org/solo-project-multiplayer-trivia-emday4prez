@@ -54,7 +54,7 @@ export default function Username({
          <input type="text" ref={inputRef} />
          <div className={styles.space}></div>
          <div className={styles.buttonContainer}>
-            <Link to={`/create/${code}`}>
+            <Link to={`/create/lobby/${code}`}>
                <button onClick={onContinue}>continue</button>
             </Link>
          </div>

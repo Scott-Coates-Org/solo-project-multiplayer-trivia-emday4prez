@@ -2,6 +2,7 @@ import React from "react";
 import Username from "./Username";
 
 import styles from "./create.module.css";
+import { Outlet } from "react-router-dom";
 
 function CreatePage({ categories }) {
    const [creatorName, setCreatorName] = React.useState("");
@@ -29,6 +30,7 @@ function CreatePage({ categories }) {
             />
          ) */
          }
+         <Outlet />
       </div>
    );
 }
