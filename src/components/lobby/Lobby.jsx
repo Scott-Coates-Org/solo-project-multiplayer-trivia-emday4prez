@@ -1,5 +1,5 @@
-import { useRef } from "react";
-import styles from "../../components/create/create.module.css";
+import { useRef, useState, useEffect } from "react";
+import { useLoaderData, useParams, useLocation } from "react-router-dom";
 import {
    updateDoc,
    doc,
@@ -7,18 +7,36 @@ import {
    collection,
    query,
    where,
+   onSnapshot,
 } from "firebase/firestore";
+import { useDocument } from "react-firebase-hooks/firestore";
 import { db } from "../../firebase/client";
-import { useLoaderData, useParams, useLocation } from "react-router-dom";
+import styles from "../../components/create/create.module.css";
 
 export default function Lobby({ lobbyOptions }) {
-   const { data: categories, gameDocId } = useLoaderData();
+   const [gameDocData, setGameDocData] = useState([]);
+   const [selectedCategoryName, setSelectedCategoryName] = useState("");
+   const { data: categories, gameDocId, users } = useLoaderData();
    console.log("render lobby -- game docID", gameDocId);
    const { roomCode } = useParams();
    let { state } = useLocation();
    const selectRef = useRef();
+   const [gameDoc, loading, error] = useDocument(doc(db, "games", gameDocId));
+   // useEffect(() => {
+   //    const unsubscribe = onSnapshot(
+   //       query(collection(db, "games"), where("roomCode", "==", roomCode)),
+   //       (querySnapshot) => {
+   //          const data = querySnapshot.docs.map((doc) => doc.data());
+   //          console.log("current data: ", data);
+   //          setGameDocData(data);
+   //       },
+   //       (error) => console.log("error", error)
+   //    );
+   //    return () => unsubscribe();
+   // }, [roomCode]);
 
-   const onCategoryChange = async () => {
+   const onCategoryChange = async (e) => {
+      setSelectedCategoryName(selectRef.current.value);
       const gameRef = doc(db, "games", gameDocId);
       await updateDoc(gameRef, {
          category: selectRef.current.value,
@@ -27,6 +45,8 @@ export default function Lobby({ lobbyOptions }) {
 
    return (
       <div className={styles.lobby}>
+         {error && <strong>Error: {JSON.stringify(error)}</strong>}
+         {loading && <span>Document: Loading...</span>}
          <h1>start game</h1>
          <p>choose a game category</p>
          <div key="cat" className={styles.categorySelect}>
@@ -45,10 +65,22 @@ export default function Lobby({ lobbyOptions }) {
                         </option>
                      ))}
             </select>
+            {gameDoc && (
+               <h3>{`selected category: ${gameDoc.data().category}`}</h3>
+            )}
          </div>
          <div>
             <h3>list of users</h3>
-            <div className={styles.userList}>display list of users</div>
+            <div className={styles.userList}>
+               {users &&
+                  users.map((user) => {
+                     return (
+                        <div key={user} className={styles.user}>
+                           {user}
+                        </div>
+                     );
+                  })}
+            </div>
          </div>
          <div>
             <h2>room code</h2>
