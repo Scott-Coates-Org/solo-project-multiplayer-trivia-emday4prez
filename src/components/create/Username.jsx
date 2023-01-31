@@ -40,7 +40,8 @@ export default function Username({
          category: categories.filter((c) => c.questionCount > 0)[0].id,
          creator: inputRef.current.value,
          dateCreated: new Date().toLocaleDateString(),
-         active: true,
+         started: false,
+         inLobby: true,
       });
       setGameDocId(gameRef.id);
       navigate(`/lobby/${code}`);

@@ -15,18 +15,6 @@ export default function Lobby({ lobbyOptions, gameDocId }) {
       });
    };
 
-   const getListOfUsers = async () => {
-      const gameRef = doc(db, "games", gameDocId);
-
-      const gameDoc = await getDoc(gameRef);
-      const gameData = gameDoc.data();
-      console.log(gameData);
-
-      return gameData;
-   };
-
-   const users = getListOfUsers();
-
    return (
       <div className={styles.lobby}>
          <h1>start game</h1>
@@ -45,14 +33,7 @@ export default function Lobby({ lobbyOptions, gameDocId }) {
          </div>
          <div>
             <h3>list of users</h3>
-            <div className={styles.userList}>
-               {users &&
-                  users.map((user) => (
-                     <div key={user}>
-                        <p>{user}</p>
-                     </div>
-                  ))}
-            </div>
+            <div className={styles.userList}>display list of users</div>
          </div>
          <div className={styles.startButton}>
             <button>start game</button>
