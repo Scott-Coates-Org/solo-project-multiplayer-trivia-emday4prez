@@ -2,7 +2,7 @@ import { useRef, useState } from "react";
 import styles from "./create.module.css";
 import { collection, addDoc } from "firebase/firestore";
 import { db } from "../../firebase/client";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, Link } from "react-router-dom";
 import { useCollection } from "../../hooks/useCollection";
 
 function makeId(length) {
@@ -27,6 +27,7 @@ export default function Username({
    const [code, setCode] = useState(makeId(4));
    const inputRef = useRef();
    const navigate = useNavigate();
+
    const onContinue = async () => {
       if (inputRef.current.value.length < 2) {
          alert("username must be at least 2 characters long");
@@ -44,7 +45,7 @@ export default function Username({
          inLobby: true,
       });
       setGameDocId(gameRef.id);
-      navigate(`/lobby/${code}`);
+      //navigate(`/create/${code}`);
    };
 
    return (
@@ -53,7 +54,9 @@ export default function Username({
          <input type="text" ref={inputRef} />
          <div className={styles.space}></div>
          <div className={styles.buttonContainer}>
-            <button onClick={onContinue}>continue</button>
+            <Link to={`/create/${code}`}>
+               <button onClick={onContinue}>continue</button>
+            </Link>
          </div>
       </div>
    );

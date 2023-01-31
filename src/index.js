@@ -41,7 +41,7 @@ const browserRouter = createBrowserRouter([
          { path: "manage", element: <Manage /> },
          { path: "create", element: <Create /> },
          { path: "join", element: <Join /> },
-         { path: "lobby/:roomCode", element: <Lobby /> },
+         { path: "create/:roomCode", element: <Lobby /> },
          { path: "*", element: <NoMatch /> },
       ],
    },

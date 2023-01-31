@@ -1,6 +1,13 @@
 import { useRef } from "react";
 import styles from "../../components/create/create.module.css";
-import { updateDoc, doc, getDoc } from "firebase/firestore";
+import {
+   updateDoc,
+   doc,
+   getDoc,
+   query,
+   collection,
+   where,
+} from "firebase/firestore";
 import { db } from "../../firebase/client";
 import { useCollection } from "../../hooks/useCollection";
 export default function Lobby({ lobbyOptions, gameDocId }) {
