@@ -65,7 +65,9 @@ export default function Lobby({ lobbyOptions }) {
                         </option>
                      ))}
             </select>
-            <h3>{`selected category: ${gameDoc.data().category}`}</h3>
+            {gameDoc && (
+               <h3>{`selected category: ${gameDoc.data().category}`}</h3>
+            )}
          </div>
          <div>
             <h3>list of users</h3>
