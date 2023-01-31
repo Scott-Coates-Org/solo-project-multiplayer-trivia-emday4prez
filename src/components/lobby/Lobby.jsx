@@ -1,11 +1,11 @@
 import { useRef } from "react";
 import styles from "../../components/create/create.module.css";
-import { updateDoc, doc } from "firebase/firestore";
+import { updateDoc, doc, getDoc } from "firebase/firestore";
 import { db } from "../../firebase/client";
-
-export default function Lobby({ lobbyOptions, categories, gameDocId }) {
-   console.log("render lobby");
-
+import { useCollection } from "../../hooks/useCollection";
+export default function Lobby({ lobbyOptions, gameDocId }) {
+   console.log("render lobby", gameDocId);
+   const { documents: categories } = useCollection("categories");
    const selectRef = useRef();
 
    const onCategoryChange = async () => {
@@ -14,6 +14,18 @@ export default function Lobby({ lobbyOptions, categories, gameDocId }) {
          category: selectRef.current.value,
       });
    };
+
+   const getListOfUsers = async () => {
+      const gameRef = doc(db, "games", gameDocId);
+
+      const gameDoc = await getDoc(gameRef);
+      const gameData = gameDoc.data();
+      console.log(gameData);
+
+      return gameData;
+   };
+
+   const users = getListOfUsers();
 
    return (
       <div className={styles.lobby}>
@@ -34,7 +46,12 @@ export default function Lobby({ lobbyOptions, categories, gameDocId }) {
          <div>
             <h3>list of users</h3>
             <div className={styles.userList}>
-               <p>(you)</p>
+               {users &&
+                  users.map((user) => (
+                     <div key={user}>
+                        <p>{user}</p>
+                     </div>
+                  ))}
             </div>
          </div>
          <div className={styles.startButton}>
