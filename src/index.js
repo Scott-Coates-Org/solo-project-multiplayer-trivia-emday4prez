@@ -31,9 +31,25 @@ const router = createBrowserRouter(
       </Route>
    )
 );
+
+const browserRouter = createBrowserRouter([
+   {
+      path: "/",
+      element: <Layout />,
+      children: [
+         { path: "/", element: <Home /> },
+         { path: "manage", element: <Manage /> },
+         { path: "create", element: <Create /> },
+         { path: "join", element: <Join /> },
+         { path: "lobby/:roomCode", element: <Lobby /> },
+         { path: "*", element: <NoMatch /> },
+      ],
+   },
+]);
+
 const root = ReactDOM.createRoot(document.getElementById("root"));
 root.render(
    <React.StrictMode>
-      <RouterProvider router={router} />
+      <RouterProvider router={browserRouter} />
    </React.StrictMode>
 );
