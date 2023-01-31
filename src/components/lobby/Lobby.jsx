@@ -21,27 +21,24 @@ export default function Lobby({ lobbyOptions }) {
    let { state } = useLocation();
    const selectRef = useRef();
    const [gameDoc, loading, error] = useDocument(doc(db, "games", gameDocId));
-   // useEffect(() => {
-   //    const unsubscribe = onSnapshot(
-   //       query(collection(db, "games"), where("roomCode", "==", roomCode)),
-   //       (querySnapshot) => {
-   //          const data = querySnapshot.docs.map((doc) => doc.data());
-   //          console.log("current data: ", data);
-   //          setGameDocData(data);
-   //       },
-   //       (error) => console.log("error", error)
-   //    );
-   //    return () => unsubscribe();
-   // }, [roomCode]);
 
-   const onCategoryChange = async (e) => {
+   const onCategoryChange = async () => {
       setSelectedCategoryName(selectRef.current.value);
       const gameRef = doc(db, "games", gameDocId);
       await updateDoc(gameRef, {
          category: selectRef.current.value,
       });
    };
-   console.log("state", state);
+
+   const onStartGame = async () => {
+      const gameRef = doc(db, "games", gameDocId);
+
+      await updateDoc(gameRef, {
+         started: true,
+         inLobby: false,
+      });
+   };
+
    return (
       <div className={styles.lobby}>
          {error && <strong>Error: {JSON.stringify(error)}</strong>}
@@ -57,13 +54,9 @@ export default function Lobby({ lobbyOptions }) {
          <div>
             <h3>list of users</h3>
             <div className={styles.userList}>
-               {users &&
-                  users.map((user) => {
-                     return (
-                        <div key={user} className={styles.user}>
-                           {user}
-                        </div>
-                     );
+               {gameDoc &&
+                  gameDoc.data().usernames.map((un) => {
+                     return <div key={un}>{un}</div>;
                   })}
             </div>
          </div>
@@ -78,7 +71,10 @@ export default function Lobby({ lobbyOptions }) {
             <div className={styles.roomCode}>{roomCode}</div>
          </div>
          <div className={styles.startButton}>
-            <button disabled={!state.host || users.length < 2}>
+            <button
+               onClick={onStartGame}
+               disabled={!state.host || users.length < 2}
+            >
                start game
             </button>
          </div>
@@ -87,7 +83,6 @@ export default function Lobby({ lobbyOptions }) {
 }
 
 function SelectCategory({ categories, selectRef, onCategoryChange }) {
-   console.log("select category", categories);
    return (
       <div>
          <h3>select category</h3>
