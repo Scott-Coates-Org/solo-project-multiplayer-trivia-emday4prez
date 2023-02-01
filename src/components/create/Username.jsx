@@ -41,6 +41,7 @@ export default function Username({
          dateCreated: new Date().toLocaleDateString(),
          started: false,
          inLobby: true,
+         loading: false,
       });
       setGameDocId(gameRef.id);
       //navigate(`/create/${code}`);

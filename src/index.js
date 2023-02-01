@@ -6,7 +6,6 @@ import Home from "./components/home/HomePage";
 import Layout from "./components/Layout";
 import Create from "./components/create/CreatePage";
 import Join from "./components/join/JoinPage";
-import Game from "./components/game/GamePage";
 import Lobby, { lobbyLoader } from "./components/lobby/Lobby";
 import NoMatch from "./components/NoMatch";
 import "./index.css";
@@ -24,10 +23,6 @@ const browserRouter = createBrowserRouter([
             path: "/lobby/:roomCode",
             element: <Lobby />,
             loader: lobbyLoader,
-         },
-         {
-            path: "/game/:gameDocId",
-            element: <Game />,
          },
          { path: "*", element: <NoMatch /> },
       ],

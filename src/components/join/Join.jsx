@@ -26,8 +26,13 @@ function Join({ username, setUsername }) {
          alert("room code does not exist");
          return;
       }
+      if (querySnapshot.docs[0].data().started) {
+         alert("game has already started");
+         return;
+      }
 
       const roomRef = querySnapshot.docs[0].ref;
+
       await updateDoc(roomRef, {
          usernames: [...querySnapshot.docs[0].data().usernames, username],
       });
