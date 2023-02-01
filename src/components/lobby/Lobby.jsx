@@ -32,9 +32,9 @@ export default function Lobby({ lobbyOptions }) {
    };
 
    const onStartGame = async () => {
-      setProgress(30);
+      setProgress(3);
       const gameRef = doc(db, "games", gameDocId);
-      setProgress(60);
+      setProgress(10);
       await updateDoc(gameRef, {
          started: true,
          inLobby: false,
@@ -98,7 +98,12 @@ export default function Lobby({ lobbyOptions }) {
                   </div>
                ) : null}
 
-               <Game />
+               {gameDoc && (
+                  <Game
+                     gameDoc={gameDoc}
+                     selectedCategoryName={selectedCategoryName}
+                  />
+               )}
             </div>
          )}
       </div>
@@ -138,6 +143,6 @@ export const lobbyLoader = async ({ params }) => {
    const q = query(gamesRef, where("roomCode", "==", roomCode));
    const gamesSnapshot = await getDocs(q);
    const gameDocId = gamesSnapshot.docs[0].id;
-   const users = gamesSnapshot.docs[0].data().usernames;
-   return { data, gameDocId, users };
+
+   return { data, gameDocId };
 };
