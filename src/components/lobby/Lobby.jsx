@@ -57,6 +57,20 @@ export default function Lobby({ lobbyOptions }) {
       console.log("categoryID", querySnapshot.docs[0].data().categoryId);
 
       setProgress(80);
+
+      const questionsRef = collection(db, "questions");
+      const q2 = query(
+         questionsRef,
+         where("categoryId", "==", querySnapshot.docs[0].data().categoryId)
+      );
+      const questies = [];
+      const querySnapshot2 = await getDocs(q2);
+      querySnapshot2.forEach((doc) => {
+         questies.push(doc.data());
+      });
+      setProgress(90);
+      console.log(questies);
+      setQuestions(questies);
    };
 
    return (
@@ -114,7 +128,11 @@ export default function Lobby({ lobbyOptions }) {
                ) : null}
 
                {gameDoc?.data().started && (
-                  <Game gameDoc={gameDoc} questions={questions} />
+                  <Game
+                     gameDoc={gameDoc}
+                     questions={questions}
+                     categoryID={categoryID}
+                  />
                )}
             </div>
          )}
