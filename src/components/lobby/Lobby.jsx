@@ -1,5 +1,5 @@
 import { useRef, useState } from "react";
-import { useLoaderData, useParams, useLocation, Link } from "react-router-dom";
+import { useLoaderData, useParams, useLocation } from "react-router-dom";
 import {
    updateDoc,
    doc,
@@ -15,16 +15,20 @@ import Game from "../game/Game";
 import styles from "../../components/create/create.module.css";
 
 export default function Lobby({ lobbyOptions }) {
-   const [selectedCategoryName, setSelectedCategoryName] = useState("");
    const { data: categories, gameDocId } = useLoaderData();
+   const [gameDoc, loading, error] = useDocument(doc(db, "games", gameDocId));
    console.log("render lobby -- game docID", gameDocId);
+
+   const [categoryID, setCategoryID] = useState("");
+
    const { roomCode } = useParams();
    let { state } = useLocation();
    const selectRef = useRef();
-   const [gameDoc, loading, error] = useDocument(doc(db, "games", gameDocId));
+
+   const [questions, setQuestions] = useState([]);
    const [progress, setProgress] = useState(0);
+
    const onCategoryChange = async () => {
-      setSelectedCategoryName(selectRef.current.value);
       const gameRef = doc(db, "games", gameDocId);
       await updateDoc(gameRef, {
          category: selectRef.current.value,
@@ -41,7 +45,17 @@ export default function Lobby({ lobbyOptions }) {
          dateStarted: new Date().toLocaleDateString(),
          loading: true,
       });
-      setProgress(99);
+      setProgress(50);
+      const categoryRef = collection(db, "categories");
+      const q = query(
+         categoryRef,
+         where("categoryName", "==", selectRef.current.value)
+      );
+      const querySnapshot = await getDocs(q);
+      setCategoryID(querySnapshot.docs[0].categoryId);
+      console.log("categoryID", querySnapshot.docs[0].data().categoryId);
+      setProgress(60);
+      setProgress(80);
    };
 
    return (
@@ -61,7 +75,7 @@ export default function Lobby({ lobbyOptions }) {
                <div>
                   <h3>list of users</h3>
                   <div className={styles.userList}>
-                     {gameDoc &&
+                     {!loading &&
                         gameDoc.data().usernames.map((un) => {
                            return <div key={un}>{un}</div>;
                         })}
@@ -98,11 +112,8 @@ export default function Lobby({ lobbyOptions }) {
                   </div>
                ) : null}
 
-               {gameDoc && (
-                  <Game
-                     gameDoc={gameDoc}
-                     selectedCategoryName={selectedCategoryName}
-                  />
+               {gameDoc?.data().started && (
+                  <Game gameDoc={gameDoc} questions={questions} />
                )}
             </div>
          )}

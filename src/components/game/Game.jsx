@@ -1,19 +1,23 @@
-import { useCollectionDataOnce } from "react-firebase-hooks/firestore";
-import { collection, query, where } from "firebase/firestore";
-import { db } from "../../firebase/client";
-function Game({ gameDoc, selectedCategoryName }) {
-   const [questions, loading, error] = useCollectionDataOnce(
-      query(
-         collection(db, "questions"),
-         where("category", "==", selectedCategoryName)
-      )
-   );
-   console.log("questions", questions);
+import { useState } from "react";
+
+function Game({ gameDoc, questions }) {
+   const [questionIndex, setQuestionIndex] = useState(0);
+   // async function getQuestions() {
+   //    const questionsRef = collection(db, "questions");
+   //    const questionsQuery = query(
+   //       questionsRef,
+   //       where("category", "==", gameDoc.data().category)
+   //    );
+   //    const querySnapshot = await getDocs(questionsQuery);
+   //    const questions = querySnapshot.docs.map((doc) => doc.data());
+   //    return questions;
+   // }
 
    return (
       <div>
          <h1>game</h1>
-         <div></div>
+         <h2>category: {gameDoc.data().category}</h2>
+         <h2>question: {questions}</h2>
       </div>
    );
 }
