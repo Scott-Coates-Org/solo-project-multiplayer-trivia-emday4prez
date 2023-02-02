@@ -51,10 +51,11 @@ export default function Lobby({ lobbyOptions }) {
          categoryRef,
          where("categoryName", "==", selectRef.current.value)
       );
-      const querySnapshot = await getDocs(q);
-      setCategoryID(querySnapshot.docs[0].categoryId);
-      console.log("categoryID", querySnapshot.docs[0].data().categoryId);
       setProgress(60);
+      const querySnapshot = await getDocs(q);
+      setCategoryID(querySnapshot.docs[0].data().categoryId);
+      console.log("categoryID", querySnapshot.docs[0].data().categoryId);
+
       setProgress(80);
    };
 
