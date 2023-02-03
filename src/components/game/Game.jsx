@@ -1,9 +1,12 @@
-import { useParams } from "react-router-dom";
-import { doc } from "firebase/firestore";
-import { useDocument } from "react-firebase-hooks/firestore";
-import { db } from "../../firebase/client";
-function Game() {
-   return <div>game</div>;
+import { useState } from "react";
+
+function Game({ gameDoc }) {
+   return (
+      <div>
+         <h1>game</h1>
+         <h2>category: {gameDoc.data().category}</h2>
+      </div>
+   );
 }
 
 export default Game;

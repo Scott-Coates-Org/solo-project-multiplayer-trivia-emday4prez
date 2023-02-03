@@ -1,5 +1,5 @@
 import { useRef, useState } from "react";
-import { useLoaderData, useParams, useLocation, Link } from "react-router-dom";
+import { useLoaderData, useParams, useLocation } from "react-router-dom";
 import {
    updateDoc,
    doc,
@@ -15,16 +15,20 @@ import Game from "../game/Game";
 import styles from "../../components/create/create.module.css";
 
 export default function Lobby({ lobbyOptions }) {
-   const [selectedCategoryName, setSelectedCategoryName] = useState("");
    const { data: categories, gameDocId } = useLoaderData();
+   const [gameDoc, loading, error] = useDocument(doc(db, "games", gameDocId));
    console.log("render lobby -- game docID", gameDocId);
+
+   const [categoryID, setCategoryID] = useState("");
+
    const { roomCode } = useParams();
    let { state } = useLocation();
    const selectRef = useRef();
-   const [gameDoc, loading, error] = useDocument(doc(db, "games", gameDocId));
+
+   const [questions, setQuestions] = useState([]);
    const [progress, setProgress] = useState(0);
+
    const onCategoryChange = async () => {
-      setSelectedCategoryName(selectRef.current.value);
       const gameRef = doc(db, "games", gameDocId);
       await updateDoc(gameRef, {
          category: selectRef.current.value,
@@ -32,16 +36,41 @@ export default function Lobby({ lobbyOptions }) {
    };
 
    const onStartGame = async () => {
-      setProgress(30);
+      setProgress(3);
       const gameRef = doc(db, "games", gameDocId);
-      setProgress(60);
+      setProgress(10);
       await updateDoc(gameRef, {
          started: true,
          inLobby: false,
          dateStarted: new Date().toLocaleDateString(),
          loading: true,
       });
-      setProgress(99);
+      setProgress(50);
+      const categoryRef = collection(db, "categories");
+      const q = query(
+         categoryRef,
+         where("categoryName", "==", selectRef.current.value)
+      );
+      setProgress(60);
+      const querySnapshot = await getDocs(q);
+      setCategoryID(querySnapshot.docs[0].data().categoryId);
+      console.log("categoryID", querySnapshot.docs[0].data().categoryId);
+
+      setProgress(80);
+
+      const questionsRef = collection(db, "questions");
+      const q2 = query(
+         questionsRef,
+         where("categoryId", "==", querySnapshot.docs[0].data().categoryId)
+      );
+      const questies = [];
+      const querySnapshot2 = await getDocs(q2);
+      querySnapshot2.forEach((doc) => {
+         questies.push(doc.data());
+      });
+      setProgress(90);
+      console.log(questies);
+      setQuestions(questies);
    };
 
    return (
@@ -61,7 +90,7 @@ export default function Lobby({ lobbyOptions }) {
                <div>
                   <h3>list of users</h3>
                   <div className={styles.userList}>
-                     {gameDoc &&
+                     {!loading &&
                         gameDoc.data().usernames.map((un) => {
                            return <div key={un}>{un}</div>;
                         })}
@@ -98,7 +127,13 @@ export default function Lobby({ lobbyOptions }) {
                   </div>
                ) : null}
 
-               <Game />
+               {gameDoc?.data().started && (
+                  <Game
+                     gameDoc={gameDoc}
+                     questions={questions}
+                     categoryID={categoryID}
+                  />
+               )}
             </div>
          )}
       </div>
@@ -138,6 +173,6 @@ export const lobbyLoader = async ({ params }) => {
    const q = query(gamesRef, where("roomCode", "==", roomCode));
    const gamesSnapshot = await getDocs(q);
    const gameDocId = gamesSnapshot.docs[0].id;
-   const users = gamesSnapshot.docs[0].data().usernames;
-   return { data, gameDocId, users };
+
+   return { data, gameDocId };
 };
