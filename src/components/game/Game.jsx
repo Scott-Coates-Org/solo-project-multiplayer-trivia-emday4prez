@@ -1,6 +1,6 @@
 import { useState } from "react";
 
-function Game({ gameDoc, questions, categoryID }) {
+function Game({ gameDoc }) {
    return (
       <div>
          <h1>game</h1>
