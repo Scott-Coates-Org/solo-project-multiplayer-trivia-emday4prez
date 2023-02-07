@@ -14,13 +14,14 @@ import { db } from "../../firebase/client";
 import Game from "../game/Game";
 import styles from "../../components/create/create.module.css";
 import { categoriesRef, questionsRef } from "../../firebase/client";
+
 export default function Lobby({ lobbyOptions }) {
    const { data: categories, gameDocId } = useLoaderData();
    const [gameDoc, loading, error] = useDocument(doc(db, "games", gameDocId));
    console.log("render lobby -- game docID", gameDocId);
 
    const [categoryID, setCategoryID] = useState("");
-
+   const [gameStarted, setGameStarted] = useState(false);
    const { roomCode } = useParams();
    let { state } = useLocation();
    const selectRef = useRef();
@@ -33,11 +34,13 @@ export default function Lobby({ lobbyOptions }) {
       await updateDoc(gameRef, {
          category: selectRef.current.value,
       });
+      console.log("category changed", selectRef.current.value);
    };
 
    const onStartGame = async () => {
       setProgress(3);
       const gameRef = doc(db, "games", gameDocId);
+      setGameStarted(true);
       setProgress(10);
       await updateDoc(gameRef, {
          started: true,
@@ -68,22 +71,26 @@ export default function Lobby({ lobbyOptions }) {
          qs.push(doc.data());
       });
       setProgress(90);
-
       setQuestions(qs);
+      await updateDoc(gameRef, {
+         loading: false,
+      });
+      setProgress(100);
    };
 
    return (
       <div className={styles.lobby}>
          {error && <strong>Error: {JSON.stringify(error)}</strong>}
          {loading && <span>Document: Loading...</span>}
-         {!error && !loading && (
-            <div>
+         {gameDoc && (
+            <>
                <h1>game lobby</h1>
                {state.host && (
                   <SelectCategory
                      onCategoryChange={onCategoryChange}
                      selectRef={selectRef}
                      categories={categories}
+                     categoryId={categoryID}
                   />
                )}
                <div>
@@ -115,35 +122,44 @@ export default function Lobby({ lobbyOptions }) {
                      start game
                   </button>
                </div>
-               {gameDoc?.data().loading ? (
-                  <div>
-                     <ProgressBar
-                        bgcolor="orange"
-                        progress={progress}
-                        height={30}
-                     />
-                     <p>the game will begin soon</p>
-                  </div>
-               ) : null}
-
-               {gameDoc?.data().started && (
-                  <Game
-                     gameDoc={gameDoc}
-                     questions={questions}
-                     categoryID={categoryID}
-                  />
-               )}
-            </div>
+            </>
          )}
+         <div>
+            {gameDoc?.data().started && (
+               <Game
+                  gameDoc={gameDoc}
+                  questions={questions}
+                  categoryID={categoryID}
+               />
+            )}
+            {gameDoc?.data().loading ? (
+               <div>
+                  <ProgressBar
+                     bgcolor="orange"
+                     progress={progress}
+                     height={30}
+                  />
+                  <p>the game will begin soon</p>
+               </div>
+            ) : null}
+         </div>
       </div>
    );
 }
 
-function SelectCategory({ categories, selectRef, onCategoryChange }) {
+function SelectCategory({
+   categories,
+   selectRef,
+   onCategoryChange,
+   categoryId,
+}) {
    return (
       <div>
          <h3>select category</h3>
          <select ref={selectRef} onChange={onCategoryChange}>
+            {/* <option value=" " disabled>
+               Choose here
+            </option> */}
             {categories &&
                categories.map((category) => {
                   return (

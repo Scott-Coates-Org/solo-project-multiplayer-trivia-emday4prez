@@ -30,3 +30,4 @@ export const findAndDelete = async (collection, id) => {
 export const categoriesRef = collection(db, "categories");
 export const questionsRef = collection(db, "questions");
 export const answersRef = collection(db, "answers");
+export const gamesRef = collection(db, "games");
