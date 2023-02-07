@@ -21,7 +21,6 @@ export default function Lobby({ lobbyOptions }) {
    console.log("render lobby -- game docID", gameDocId);
 
    const [categoryID, setCategoryID] = useState("");
-   const [gameStarted, setGameStarted] = useState(false);
    const { roomCode } = useParams();
    let { state } = useLocation();
    const selectRef = useRef();
@@ -40,11 +39,10 @@ export default function Lobby({ lobbyOptions }) {
    const onStartGame = async () => {
       setProgress(3);
       const gameRef = doc(db, "games", gameDocId);
-      setGameStarted(true);
       setProgress(10);
       await updateDoc(gameRef, {
-         started: true,
-         inLobby: false,
+         started: false,
+
          dateStarted: new Date().toLocaleDateString(),
          loading: true,
       });
@@ -75,6 +73,9 @@ export default function Lobby({ lobbyOptions }) {
       console.log("qs", qs);
       await updateDoc(gameRef, {
          loading: false,
+         started: true,
+         inLobby: false,
+         questions: qs,
       });
       setProgress(100);
    };
