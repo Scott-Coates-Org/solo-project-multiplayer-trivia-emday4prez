@@ -72,6 +72,7 @@ export default function Lobby({ lobbyOptions }) {
       });
       setProgress(90);
       setQuestions(qs);
+      console.log("qs", qs);
       await updateDoc(gameRef, {
          loading: false,
       });
@@ -82,7 +83,7 @@ export default function Lobby({ lobbyOptions }) {
       <div className={styles.lobby}>
          {error && <strong>Error: {JSON.stringify(error)}</strong>}
          {loading && <span>Document: Loading...</span>}
-         {gameDoc && (
+         {gameDoc?.data().inLobby && (
             <>
                <h1>game lobby</h1>
                {state.host && (
