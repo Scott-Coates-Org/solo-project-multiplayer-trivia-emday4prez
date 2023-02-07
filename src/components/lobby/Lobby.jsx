@@ -13,7 +13,7 @@ import ProgressBar from "../ProgressBar";
 import { db } from "../../firebase/client";
 import Game from "../game/Game";
 import styles from "../../components/create/create.module.css";
-
+import { categoriesRef, questionsRef } from "../../firebase/client";
 export default function Lobby({ lobbyOptions }) {
    const { data: categories, gameDocId } = useLoaderData();
    const [gameDoc, loading, error] = useDocument(doc(db, "games", gameDocId));
@@ -46,9 +46,9 @@ export default function Lobby({ lobbyOptions }) {
          loading: true,
       });
       setProgress(50);
-      const categoryRef = collection(db, "categories");
+
       const q = query(
-         categoryRef,
+         categoriesRef,
          where("categoryName", "==", selectRef.current.value)
       );
       setProgress(60);
@@ -58,7 +58,6 @@ export default function Lobby({ lobbyOptions }) {
 
       setProgress(80);
 
-      const questionsRef = collection(db, "questions");
       const q2 = query(
          questionsRef,
          where("categoryId", "==", querySnapshot.docs[0].data().categoryId)
@@ -163,8 +162,8 @@ function SelectCategory({ categories, selectRef, onCategoryChange }) {
 
 export const lobbyLoader = async ({ params }) => {
    const { roomCode } = params;
-   const categoryRef = collection(db, "categories");
-   const categorySnapshot = await getDocs(categoryRef);
+
+   const categorySnapshot = await getDocs(categoriesRef);
    const data = [];
    categorySnapshot.docs.forEach((doc) => {
       data.push(doc.data());

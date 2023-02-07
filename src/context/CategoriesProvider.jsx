@@ -1,5 +1,5 @@
 import React, { useState, useEffect, createContext } from "react";
-
+import { collection, onSnapshot } from "firebase/firestore";
 import { db } from "../firebase/client";
 import "firebase/firestore";
 
@@ -8,13 +8,17 @@ const CategoriesProvider = ({ children }) => {
    const [categoryData, setCategoryData] = useState([]);
 
    useEffect(() => {
-      db.collection("categories").onSnapshot((snapshot) => {
-         const data = snapshot.docs.map((doc) => ({
-            id: doc.id,
-            ...doc.data(),
-         }));
-         setCategoryData(data);
+      let query = collection(db, "categories");
+
+      const unsub = onSnapshot(query, (snapshot) => {
+         let results = [];
+         snapshot.docs.forEach((doc) => {
+            results.push({ id: doc.id, ...doc.data() });
+         });
+         setCategoryData(results);
       });
+
+      return () => unsub();
    }, []);
 
    return (
