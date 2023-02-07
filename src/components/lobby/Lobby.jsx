@@ -63,14 +63,14 @@ export default function Lobby({ lobbyOptions }) {
          questionsRef,
          where("categoryId", "==", querySnapshot.docs[0].data().categoryId)
       );
-      const questies = [];
+      const qs = [];
       const querySnapshot2 = await getDocs(q2);
       querySnapshot2.forEach((doc) => {
-         questies.push(doc.data());
+         qs.push(doc.data());
       });
       setProgress(90);
-      console.log(questies);
-      setQuestions(questies);
+
+      setQuestions(qs);
    };
 
    return (
