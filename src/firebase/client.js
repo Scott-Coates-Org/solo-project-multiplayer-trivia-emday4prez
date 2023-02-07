@@ -1,5 +1,5 @@
 import { initializeApp } from "firebase/app";
-import { getFirestore, doc, deleteDoc } from "firebase/firestore";
+import { getFirestore, doc, deleteDoc, collection } from "firebase/firestore";
 
 const firebaseKey = process.env.REACT_APP_FIREBASE_API_KEY;
 const firebaseProjectId = process.env.REACT_APP_FIREBASE_PROJECT_ID;
@@ -26,3 +26,8 @@ export const findAndDelete = async (collection, id) => {
    const docRef = doc(db, collection, id);
    await deleteDoc(docRef);
 };
+
+export const categoriesRef = collection(db, "categories");
+export const questionsRef = collection(db, "questions");
+export const answersRef = collection(db, "answers");
+export const gamesRef = collection(db, "games");

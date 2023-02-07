@@ -8,6 +8,9 @@ import Create from "./components/create/CreatePage";
 import Join from "./components/join/JoinPage";
 import Lobby, { lobbyLoader } from "./components/lobby/Lobby";
 import NoMatch from "./components/NoMatch";
+import CategoriesProvider from "./context/CategoriesProvider";
+import QuestionsProvider from "./context/QuestionsProvider";
+import AnswersProvider from "./context/AnswersProvider";
 import "./index.css";
 
 const browserRouter = createBrowserRouter([
@@ -32,6 +35,12 @@ const browserRouter = createBrowserRouter([
 const root = ReactDOM.createRoot(document.getElementById("root"));
 root.render(
    <React.StrictMode>
-      <RouterProvider router={browserRouter} />
+      <CategoriesProvider>
+         <QuestionsProvider>
+            <AnswersProvider>
+               <RouterProvider router={browserRouter} />
+            </AnswersProvider>
+         </QuestionsProvider>
+      </CategoriesProvider>
    </React.StrictMode>
 );

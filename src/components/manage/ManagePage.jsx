@@ -1,8 +1,10 @@
-import { useState } from "react";
+import { useContext, useState } from "react";
 import CategoryTable from "./CategoryTable";
 import QuestionsTable from "./QuestionsTable";
 import AnswersTable from "./AnswersTable";
-import { useCollection } from "../../hooks/useCollection";
+import { CategoriesContext } from "../../context/CategoriesProvider";
+import { QuestionsContext } from "../../context/QuestionsProvider";
+import { AnswersContext } from "../../context/AnswersProvider";
 
 function Manage() {
    console.log("manage page");
@@ -10,7 +12,9 @@ function Manage() {
    const [selectedQuestionId, setSelectedQuestionId] = useState("");
    const [selectedCategoryId, setSelectedCategoryId] = useState("");
    const [selectedAnswerDocId, setSelectedAnswerDocId] = useState("");
-   // const { documents: categories } = useCollection("categories");
+   const categories = useContext(CategoriesContext);
+   const questions = useContext(QuestionsContext);
+   const answers = useContext(AnswersContext);
    // const { documents: questions } = useCollection("questions");
    // const { documents: answers } = useCollection("answers");
    return (
