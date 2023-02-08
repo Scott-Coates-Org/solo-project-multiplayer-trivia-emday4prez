@@ -13,7 +13,7 @@ import ProgressBar from "../ProgressBar";
 import { db } from "../../firebase/client";
 import Game from "../game/Game";
 import styles from "../../components/create/create.module.css";
-import { categoriesRef, questionsRef } from "../../firebase/client";
+import { categoriesRef, questionsRef, answersRef } from "../../firebase/client";
 
 export default function Lobby({ lobbyOptions }) {
    const { data: categories, gameDocId } = useLoaderData();
@@ -42,40 +42,121 @@ export default function Lobby({ lobbyOptions }) {
       setProgress(10);
       await updateDoc(gameRef, {
          started: false,
-
+         loadProgress: 0,
          dateStarted: new Date().toLocaleDateString(),
          loading: true,
       });
       setProgress(50);
 
-      const q = query(
+      const cat_q = query(
          categoriesRef,
          where("categoryName", "==", selectRef.current.value)
       );
       setProgress(60);
-      const querySnapshot = await getDocs(q);
+      const querySnapshot = await getDocs(cat_q);
       setCategoryID(querySnapshot.docs[0].data().categoryId);
       console.log("categoryID", querySnapshot.docs[0].data().categoryId);
 
       setProgress(80);
 
-      const q2 = query(
+      const questions_q = query(
          questionsRef,
          where("categoryId", "==", querySnapshot.docs[0].data().categoryId)
       );
-      const qs = [];
-      const querySnapshot2 = await getDocs(q2);
-      querySnapshot2.forEach((doc) => {
-         qs.push(doc.data());
+
+      const quests = [];
+      const questionsSnapshot = await getDocs(questions_q);
+      questionsSnapshot.forEach(async (doc) => {
+         let question = doc.data();
+         question.id = doc.id;
+         // Get all answers for this question
+         const answersQuery = query(
+            answersRef,
+            where("questionId", "==", question.questionId)
+         );
+         const answersSnapshot = await getDocs(answersQuery);
+         let answers = [];
+
+         //                // Loop through the answer documents
+         answersSnapshot.forEach((answerDoc) => {
+            let answer = answerDoc.data();
+            answer.id = answerDoc.id;
+
+            //                   // Add the answer to the array
+            answers.push(answer);
+         });
+
+         //                // Add the answers to the question
+         question.answers = answers;
+
+         //                // Add the question to the array
+         quests.push(question);
       });
+      setQuestions(quests);
+
+      // const questionsQuery = questionsRef.where(
+      //    "categoryId",
+      //    "==",
+      //    selectRef.current.value
+      // );
+
+      // questionsQuery
+      //    .get()
+      //    .then((snapshot) => {
+      //       // Create an array to store the questions
+      //       let questions = [];
+
+      //       // Loop through the question documents
+      //       snapshot.forEach((doc) => {
+      //          let question = doc.data();
+      //          question.id = doc.id;
+
+      //          // Get all answers for this question
+      //          const answersQuery = answersRef.where(
+      //             "questionId",
+      //             "==",
+      //             question.questionId
+      //          );
+      //          console.log("question", question);
+      //          answersQuery
+      //             .get()
+      //             .then((answersSnapshot) => {
+      //                // Create an array to store the answers
+      //                let answers = [];
+
+      //                // Loop through the answer documents
+      //                answersSnapshot.forEach((answerDoc) => {
+      //                   let answer = answerDoc.data();
+      //                   answer.id = answerDoc.id;
+
+      //                   // Add the answer to the array
+      //                   answers.push(answer);
+      //                });
+
+      //                // Add the answers to the question
+      //                question.answers = answers;
+
+      //                // Add the question to the array
+      //                questions.push(question);
+      //             })
+      //             .catch((error) => {
+      //                console.error("Error getting answers: ", error);
+      //             });
+      //       });
+      //       setQuestions(questions);
+      //       // Do something with the questions array
+      //       console.log(questions);
+      //    })
+      //    .catch((error) => {
+      //       console.error("Error getting questions: ", error);
+      //    });
+
       setProgress(90);
-      setQuestions(qs);
-      console.log("qs", qs);
       await updateDoc(gameRef, {
          loading: false,
          started: true,
          inLobby: false,
-         questions: qs,
+         questions: questions,
       });
       setProgress(100);
    };
