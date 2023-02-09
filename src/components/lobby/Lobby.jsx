@@ -7,6 +7,7 @@ import {
    collection,
    query,
    where,
+   limit,
 } from "firebase/firestore";
 import { useDocument } from "react-firebase-hooks/firestore";
 import ProgressBar from "../ProgressBar";
@@ -26,7 +27,6 @@ export default function Lobby({ lobbyOptions }) {
    const selectRef = useRef();
 
    const [questions, setQuestions] = useState([]);
-   const [progress, setProgress] = useState(0);
 
    const onCategoryChange = async () => {
       const gameRef = doc(db, "games", gameDocId);
@@ -37,35 +37,48 @@ export default function Lobby({ lobbyOptions }) {
    };
 
    const onStartGame = async () => {
-      setProgress(3);
       const gameRef = doc(db, "games", gameDocId);
-      setProgress(10);
+      await updateDoc(gameRef, {
+         loadProgress: 10,
+      });
       await updateDoc(gameRef, {
          started: false,
          loadProgress: 0,
          dateStarted: new Date().toLocaleDateString(),
          loading: true,
+         currentQuestion: 0,
       });
-      setProgress(50);
+      await updateDoc(gameRef, {
+         loadProgress: 30,
+      });
 
       const cat_q = query(
          categoriesRef,
          where("categoryName", "==", selectRef.current.value)
       );
-      setProgress(60);
+
       const querySnapshot = await getDocs(cat_q);
       setCategoryID(querySnapshot.docs[0].data().categoryId);
-      console.log("categoryID", querySnapshot.docs[0].data().categoryId);
 
-      setProgress(80);
+      await updateDoc(gameRef, {
+         loadProgress: 60,
+      });
 
       const questions_q = query(
          questionsRef,
-         where("categoryId", "==", querySnapshot.docs[0].data().categoryId)
+         where(
+            "categoryId",
+            "==",
+            querySnapshot.docs[0].data().categoryId,
+            limit(5)
+         )
       );
 
       const quests = [];
       const questionsSnapshot = await getDocs(questions_q);
+      await updateDoc(gameRef, {
+         loadProgress: 80,
+      });
       questionsSnapshot.forEach(async (doc) => {
          let question = doc.data();
          question.id = doc.id;
@@ -91,8 +104,10 @@ export default function Lobby({ lobbyOptions }) {
 
          //                // Add the question to the array
          quests.push(question);
+         await updateDoc(gameRef, {
+            questions: quests,
+         });
       });
-      setQuestions(quests);
 
       // const questionsQuery = questionsRef.where(
       //    "categoryId",
@@ -151,14 +166,12 @@ export default function Lobby({ lobbyOptions }) {
       //       console.error("Error getting questions: ", error);
       //    });
 
-      setProgress(90);
       await updateDoc(gameRef, {
          loading: false,
          started: true,
          inLobby: false,
-         questions: questions,
+         loadProgress: 100,
       });
-      setProgress(100);
    };
 
    return (
@@ -219,7 +232,7 @@ export default function Lobby({ lobbyOptions }) {
                <div>
                   <ProgressBar
                      bgcolor="orange"
-                     progress={progress}
+                     progress={gameDoc?.data().loadProgress}
                      height={30}
                   />
                   <p>the game will begin soon</p>
