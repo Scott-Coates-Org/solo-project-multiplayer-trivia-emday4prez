@@ -90,81 +90,24 @@ export default function Lobby({ lobbyOptions }) {
          const answersSnapshot = await getDocs(answersQuery);
          let answers = [];
 
-         //                // Loop through the answer documents
+         // Loop through the answer documents
          answersSnapshot.forEach((answerDoc) => {
             let answer = answerDoc.data();
             answer.id = answerDoc.id;
 
-            //                   // Add the answer to the array
+            // Add the answer to the array
             answers.push(answer);
          });
 
-         //                // Add the answers to the question
+         // Add the answers to the question
          question.answers = answers;
 
-         //                // Add the question to the array
+         // Add the question to the array
          quests.push(question);
          await updateDoc(gameRef, {
             questions: quests,
          });
       });
-
-      // const questionsQuery = questionsRef.where(
-      //    "categoryId",
-      //    "==",
-      //    selectRef.current.value
-      // );
-
-      // questionsQuery
-      //    .get()
-      //    .then((snapshot) => {
-      //       // Create an array to store the questions
-      //       let questions = [];
-
-      //       // Loop through the question documents
-      //       snapshot.forEach((doc) => {
-      //          let question = doc.data();
-      //          question.id = doc.id;
-
-      //          // Get all answers for this question
-      //          const answersQuery = answersRef.where(
-      //             "questionId",
-      //             "==",
-      //             question.questionId
-      //          );
-      //          console.log("question", question);
-      //          answersQuery
-      //             .get()
-      //             .then((answersSnapshot) => {
-      //                // Create an array to store the answers
-      //                let answers = [];
-
-      //                // Loop through the answer documents
-      //                answersSnapshot.forEach((answerDoc) => {
-      //                   let answer = answerDoc.data();
-      //                   answer.id = answerDoc.id;
-
-      //                   // Add the answer to the array
-      //                   answers.push(answer);
-      //                });
-
-      //                // Add the answers to the question
-      //                question.answers = answers;
-
-      //                // Add the question to the array
-      //                questions.push(question);
-      //             })
-      //             .catch((error) => {
-      //                console.error("Error getting answers: ", error);
-      //             });
-      //       });
-      //       setQuestions(questions);
-      //       // Do something with the questions array
-      //       console.log(questions);
-      //    })
-      //    .catch((error) => {
-      //       console.error("Error getting questions: ", error);
-      //    });
 
       await updateDoc(gameRef, {
          loading: false,
