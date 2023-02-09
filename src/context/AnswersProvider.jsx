@@ -1,16 +1,16 @@
 import React, { useState, useEffect, createContext } from "react";
 
-import { db } from "../firebase/client";
+import { db, answersRef } from "../firebase/client";
 import { onSnapshot, collection } from "firebase/firestore";
 
 export const AnswersContext = createContext();
-const CategoriesProvider = ({ children }) => {
+const AnswersProvider = ({ children }) => {
    const [answersData, setAnswersData] = useState([]);
 
    useEffect(() => {
-      let query = collection(db, "categories");
+      // let query = collection(db, "answers");
 
-      const unsub = onSnapshot(query, (snapshot) => {
+      const unsub = onSnapshot(answersRef, (snapshot) => {
          let results = [];
          snapshot.docs.forEach((doc) => {
             results.push({ id: doc.id, ...doc.data() });
@@ -28,4 +28,4 @@ const CategoriesProvider = ({ children }) => {
    );
 };
 
-export default CategoriesProvider;
+export default AnswersProvider;

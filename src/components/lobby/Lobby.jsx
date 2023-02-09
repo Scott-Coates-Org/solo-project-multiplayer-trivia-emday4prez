@@ -7,13 +7,14 @@ import {
    collection,
    query,
    where,
+   limit,
 } from "firebase/firestore";
 import { useDocument } from "react-firebase-hooks/firestore";
 import ProgressBar from "../ProgressBar";
 import { db } from "../../firebase/client";
 import Game from "../game/Game";
 import styles from "../../components/create/create.module.css";
-import { categoriesRef, questionsRef } from "../../firebase/client";
+import { categoriesRef, questionsRef, answersRef } from "../../firebase/client";
 
 export default function Lobby({ lobbyOptions }) {
    const { data: categories, gameDocId } = useLoaderData();
@@ -26,7 +27,6 @@ export default function Lobby({ lobbyOptions }) {
    const selectRef = useRef();
 
    const [questions, setQuestions] = useState([]);
-   const [progress, setProgress] = useState(0);
 
    const onCategoryChange = async () => {
       const gameRef = doc(db, "games", gameDocId);
@@ -37,47 +37,84 @@ export default function Lobby({ lobbyOptions }) {
    };
 
    const onStartGame = async () => {
-      setProgress(3);
       const gameRef = doc(db, "games", gameDocId);
-      setProgress(10);
+      await updateDoc(gameRef, {
+         loadProgress: 10,
+      });
       await updateDoc(gameRef, {
          started: false,
-
+         loadProgress: 0,
          dateStarted: new Date().toLocaleDateString(),
          loading: true,
+         currentQuestion: 0,
       });
-      setProgress(50);
+      await updateDoc(gameRef, {
+         loadProgress: 30,
+      });
 
-      const q = query(
+      const cat_q = query(
          categoriesRef,
          where("categoryName", "==", selectRef.current.value)
       );
-      setProgress(60);
-      const querySnapshot = await getDocs(q);
+
+      const querySnapshot = await getDocs(cat_q);
       setCategoryID(querySnapshot.docs[0].data().categoryId);
-      console.log("categoryID", querySnapshot.docs[0].data().categoryId);
 
-      setProgress(80);
-
-      const q2 = query(
-         questionsRef,
-         where("categoryId", "==", querySnapshot.docs[0].data().categoryId)
-      );
-      const qs = [];
-      const querySnapshot2 = await getDocs(q2);
-      querySnapshot2.forEach((doc) => {
-         qs.push(doc.data());
+      await updateDoc(gameRef, {
+         loadProgress: 60,
       });
-      setProgress(90);
-      setQuestions(qs);
-      console.log("qs", qs);
+
+      const questions_q = query(
+         questionsRef,
+         where(
+            "categoryId",
+            "==",
+            querySnapshot.docs[0].data().categoryId,
+            limit(5)
+         )
+      );
+
+      const quests = [];
+      const questionsSnapshot = await getDocs(questions_q);
+      await updateDoc(gameRef, {
+         loadProgress: 80,
+      });
+      questionsSnapshot.forEach(async (doc) => {
+         let question = doc.data();
+         question.id = doc.id;
+         // Get all answers for this question
+         const answersQuery = query(
+            answersRef,
+            where("questionId", "==", question.questionId)
+         );
+         const answersSnapshot = await getDocs(answersQuery);
+         let answers = [];
+
+         // Loop through the answer documents
+         answersSnapshot.forEach((answerDoc) => {
+            let answer = answerDoc.data();
+            answer.id = answerDoc.id;
+
+            // Add the answer to the array
+            answers.push(answer);
+         });
+
+         // Add the answers to the question
+         question.answers = answers;
+
+         // Add the question to the array
+         quests.push(question);
+         await updateDoc(gameRef, {
+            questions: quests,
+         });
+      });
+
       await updateDoc(gameRef, {
          loading: false,
          started: true,
          inLobby: false,
-         questions: qs,
+         loadProgress: 100,
       });
-      setProgress(100);
    };
 
    return (
@@ -138,7 +175,7 @@ export default function Lobby({ lobbyOptions }) {
                <div>
                   <ProgressBar
                      bgcolor="orange"
-                     progress={progress}
+                     progress={gameDoc?.data().loadProgress}
                      height={30}
                   />
                   <p>the game will begin soon</p>

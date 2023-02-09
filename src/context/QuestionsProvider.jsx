@@ -8,7 +8,7 @@ const QuestionsProvider = ({ children }) => {
    const [questionsData, setQuestionsData] = useState([]);
 
    useEffect(() => {
-      let query = collection(db, "categories");
+      let query = collection(db, "questions");
 
       const unsub = onSnapshot(query, (snapshot) => {
          let results = [];
